@@ -30,13 +30,7 @@ enum Name_Command
     HLT = 0,
     Bad_Input = -1
 };
-// push
-// add +
-// sub -
-// out
-// mul *
-// div /
-// hlt
+
 const int Canary = 29022008;
 
 int Stack_Pop (struct stack_k *Stack);
