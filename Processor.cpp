@@ -5,35 +5,19 @@ int main ()
     struct stack_k Stack = {};
     Stack_Ctor (&Stack, 5);
 
-    printf ("Hello!\n"
-            "I am a stack-calculator, my command:\n"
-            "PUSH (int Argument) - add to Argument in stack\n"
-            "ADD - delete two last elements stack and add to their addition\n"
-            "SUB - delete two last elements stack and add to their subtraction\n"
-            "MUL - delete two last elements stack and add to their multiplication\n"
-            "DIV - delete two last elements stack and add to their division\n"
-            "OUT - delete last element stack and print him\n"
-            "HLT - halt (finish)\n");
+    int* Buffer_With_Bite_Code = Receiving_Bite_Code ();
 
-    int Quantity_Line_Source = 9; //TODO VERY BAAAD!!
-    
-    int* Buffer_With_Bite_Code = Receiving_Bite_Code (Quantity_Line_Source);
     size_t i = 0;
     int Number_Command = Buffer_With_Bite_Code[i];
-
     while (Number_Command != HLT)
     {
         int Value = 0;
 
-        if (Number_Command == 1)
-        {
-            Value = Buffer_With_Bite_Code[i + 1];
-            i++;
-        }
-
         switch (Number_Command)
         {
             case PUSH:
+                Value = Buffer_With_Bite_Code[i + 1];
+                i++;
                 Stack_Push (&Stack, Value);
                 break;
             case ADD:
@@ -57,13 +41,11 @@ int main ()
 
         i++;
         Number_Command = Buffer_With_Bite_Code[i];
-
         Stack_Dump (&Stack, Stack_Error (&Stack));
     }
 
     free (Buffer_With_Bite_Code);
     Stack_Dtor(&Stack);
-
     return 0;
 }
 
@@ -321,8 +303,24 @@ int Stack_Check_Reserve (struct stack_k *Stack)
     return 0;
 }
 
-int* Receiving_Bite_Code (const int Quantity_Line_Source)
+int Counter_Int_Number_In_Bite_Code ()
 {
+    struct stat Data_Source = {};
+
+    if (stat ("Bite_Code.txt", &Data_Source) != 0)
+    {
+        return -1;
+    }
+
+    int Size_Source = Data_Source.st_size / sizeof(int);
+
+    return Size_Source;
+}
+
+int* Receiving_Bite_Code ()
+{
+    int Quantity_Line_Source = Counter_Int_Number_In_Bite_Code ();
+
     int* Buffer_With_Bite_Code = (int*) calloc (Quantity_Line_Source * 2, sizeof (int));
 
     FILE* File = fopen ("Bite_Code.txt", "r");
