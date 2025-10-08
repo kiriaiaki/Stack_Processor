@@ -9,8 +9,24 @@ enum Name_Command
     MUL = 4,
     DIV = 5,
     OUT = 6,
+    PUSHREG = 7,
+    POPREG = 8,
+    JB = 9,
+    JBE = 10,
+    JA = 11,
+    JAE = 12,
+    JE = 13,
+    JNE = 14,
     HLT = 0,
     Bad_Input = -1
+};
+
+enum Name_Register
+{
+    AX = 0,
+    BX = 1,
+    CX = 2,
+    DX = 3
 };
 
 #endif // GENERAL_HEADER_H

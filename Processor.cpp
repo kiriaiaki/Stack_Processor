@@ -2,50 +2,245 @@
 
 int main ()
 {
-    struct stack_k Stack = {};
-    Stack_Ctor (&Stack, 5);
+    struct processor_k Processor = {};
+    Processor_Ctor (&Processor);
 
-    int* Buffer_With_Bite_Code = Receiving_Bite_Code ();
+    int Current_Number_Command = Processor.Array_Byte_Code[Processor.Programme_Counter];
 
-    size_t i = 0;
-    int Number_Command = Buffer_With_Bite_Code[i];
-    while (Number_Command != HLT)
+    while (Current_Number_Command != HLT)
     {
         int Value = 0;
 
-        switch (Number_Command)
+        switch (Current_Number_Command)
         {
             case PUSH:
-                Value = Buffer_With_Bite_Code[i + 1];
-                i++;
-                Stack_Push (&Stack, Value);
+                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
+                Processor.Programme_Counter++;
+                Stack_Push (&Processor.Stack, Value);
                 break;
             case ADD:
-                Stack_Add (&Stack);
+                Stack_Add (&Processor.Stack);
                 break;
             case SUB:
-                Stack_Sub (&Stack);
+                Stack_Sub (&Processor.Stack);
                 break;
             case MUL:
-                Stack_Mul (&Stack);
+                Stack_Mul (&Processor.Stack);
                 break;
             case DIV:
-                Stack_Div (&Stack);
+                Stack_Div (&Processor.Stack);
                 break;
             case OUT:
-                printf ("%d\n", Stack_Out (&Stack));
+                printf ("%d\n", Stack_Out (&Processor.Stack));
+                break;
+            case PUSHREG:
+                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
+                Processor.Programme_Counter++;
+                Stack_Push_Reg (&Processor.Stack, Processor.Array_Register, Value);
+                break;
+            case POPREG:
+                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
+                Processor.Programme_Counter++;
+                Stack_Pop_Reg (&Processor.Stack, Processor.Array_Register, Value);
+                break;
+            case JB:
+                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
+                Processor.Programme_Counter++;
+                Stack_Jump_Below (&Processor.Stack, &Processor.Programme_Counter, Value);
+                break;
+            case JBE:
+                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
+                Processor.Programme_Counter++;
+                Stack_Jump_Below_Equal (&Processor.Stack, &Processor.Programme_Counter, Value);
+                break;
+            case JA:
+                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
+                Processor.Programme_Counter++;
+                Stack_Jump_Above (&Processor.Stack, &Processor.Programme_Counter, Value);
+                break;
+            case JAE:
+                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
+                Processor.Programme_Counter++;
+                Stack_Jump_Above_Equal (&Processor.Stack, &Processor.Programme_Counter, Value);
+                break;
+            case JE:
+                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
+                Processor.Programme_Counter++;
+                Stack_Jump_Equal (&Processor.Stack, &Processor.Programme_Counter, Value);
+                break;
+            case JNE:
+                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
+                Processor.Programme_Counter++;
+                Stack_Jump_Not_Equal (&Processor.Stack, &Processor.Programme_Counter, Value);
                 break;
             case HLT:
                 break;
         }
 
-        i++;
-        Number_Command = Buffer_With_Bite_Code[i];
-        Stack_Dump (&Stack, Stack_Error (&Stack));
+        Processor.Programme_Counter++;
+        Current_Number_Command = Processor.Array_Byte_Code[Processor.Programme_Counter];
     }
 
-    free (Buffer_With_Bite_Code);
-    Stack_Dtor(&Stack);
+    Processor_Dtor (&Processor);
+    return 0;
+}
+
+int Processor_Error (const struct processor_k *Processor)
+{
+    //TODO write
+    return 0;
+}
+
+int Processor_Dtor (struct processor_k *Processor)
+{
+    free (Processor->Array_Byte_Code);
+    Processor->Programme_Counter = 0;
+    Stack_Dtor(&Processor->Stack);
+    for (size_t i = 0; i < 4; i++)
+    {
+        Processor->Array_Register[i] = 0;
+    }
+    return 0;
+}
+
+int Processor_Dump (const struct processor_k *Processor)
+{
+    printf ("\n----------------------------------------------------\n");
+    printf ("\nSTACK:\n");
+    Stack_Dump (&Processor->Stack, Stack_Error (&Processor->Stack));
+
+    printf ("\nBYTE CODE: ");
+
+    for (size_t i = 0; i < Counter_Int_Number_In_Byte_Code (); i++)
+    {
+        Printer_Null_After_Number_2 (Processor->Array_Byte_Code[i]);
+        printf ("%d ",Processor->Array_Byte_Code[i]);
+    }
+    printf ("\n");
+
+    for (size_t i = 0; i < 11 + Processor->Programme_Counter * 3; i++)
+    {
+        printf (" ");
+    }
+    printf ("^^");
+
+    printf ("\nPROGRAMME COUNTER: %zu\n", Processor->Programme_Counter);
+
+    printf ("\nARRAY REGISTER: AX = %d; BX = %d; CX = %d; DX = %d",
+            Processor->Array_Register[0], Processor->Array_Register[1],
+            Processor->Array_Register[2], Processor->Array_Register[3]);
+
+    printf ("\n----------------------------------------------------\n");
+    return 0;
+}
+
+int Printer_Null_After_Number_2 (int Number)
+{
+    for (int i = 0; i < 2 - Quantity_Digit (Number); i++)
+    {
+        printf ("0");
+    }
+
+    return 0;
+}
+
+int Processor_Ctor (struct processor_k *Processor)
+{
+    Stack_Ctor(&Processor->Stack, 5);
+    Processor->Array_Byte_Code = Receiving_Byte_Code ();
+
+    return 0;
+}
+
+int Stack_Jump_Not_Equal (struct stack_k *Stack, size_t* Now_Cell , size_t First_Repeating_Cell)
+{
+    int A2 = Stack_Out (Stack);
+    int A1 = Stack_Out (Stack);
+
+    if (A1 != A2)
+    {
+        *Now_Cell = First_Repeating_Cell - 1;
+    }
+
+    return 0;
+}
+
+int Stack_Jump_Equal (struct stack_k *Stack, size_t* Now_Cell , size_t First_Repeating_Cell)
+{
+    int A2 = Stack_Out (Stack);
+    int A1 = Stack_Out (Stack);
+
+    if (A1 == A2)
+    {
+        *Now_Cell = First_Repeating_Cell - 1;
+    }
+
+    return 0;
+}
+
+int Stack_Jump_Above_Equal (struct stack_k *Stack, size_t* Now_Cell , size_t First_Repeating_Cell)
+{
+    int A2 = Stack_Out (Stack);
+    int A1 = Stack_Out (Stack);
+
+    if (A1 >= A2)
+    {
+        *Now_Cell = First_Repeating_Cell - 1;
+    }
+
+    return 0;
+}
+
+int Stack_Jump_Above (struct stack_k *Stack, size_t* Now_Cell , size_t First_Repeating_Cell)
+{
+    int A2 = Stack_Out (Stack);
+    int A1 = Stack_Out (Stack);
+
+    if (A1 > A2)
+    {
+        *Now_Cell = First_Repeating_Cell - 1;
+    }
+
+    return 0;
+}
+
+int Stack_Jump_Below_Equal (struct stack_k *Stack, size_t* Now_Cell , size_t First_Repeating_Cell)
+{
+    int A2 = Stack_Out (Stack);
+    int A1 = Stack_Out (Stack);
+
+    if (A1 <= A2)
+    {
+        *Now_Cell = First_Repeating_Cell - 1;
+    }
+
+    return 0;
+}
+
+int Stack_Jump_Below (struct stack_k *Stack, size_t* Now_Cell , size_t First_Repeating_Cell)
+{
+    int A2 = Stack_Out (Stack);
+    int A1 = Stack_Out (Stack);
+
+    if (A1 < A2)
+    {
+        *Now_Cell = First_Repeating_Cell - 1;
+    }
+
+    return 0;
+}
+
+int Stack_Push_Reg (struct stack_k *Stack, int* Array_Register, size_t Number_Register)
+{
+    Stack_Push (Stack, Array_Register[Number_Register]);
+
+    return 0;
+}
+
+int Stack_Pop_Reg (struct stack_k *Stack,  int* Array_Register, size_t Number_Register)
+{
+    Array_Register[Number_Register] = Stack_Out (Stack);
+
     return 0;
 }
 
@@ -218,17 +413,17 @@ int Stack_Error (const struct stack_k *Stack)
     return Not_Error;
 }
 
-int Stack_Dtor (const struct stack_k *Stack)
+int Stack_Dtor (struct stack_k *Stack)
 {
     free (Stack->Array);
-
+    Stack->Capacity = 0;
+    Stack->Size = 0;
     return 0;
 }
 
 int Stack_Ctor (struct stack_k *Stack, const size_t Capacity)
 {
     Stack->Array = (int*) calloc (Capacity + 2, sizeof (int));
-    Stack->Size = 0;
     Stack->Capacity = Capacity + 2;
 
     Stack->Array[0] = Canary;
@@ -303,11 +498,11 @@ int Stack_Check_Reserve (struct stack_k *Stack)
     return 0;
 }
 
-int Counter_Int_Number_In_Bite_Code ()
+int Counter_Int_Number_In_Byte_Code ()
 {
     struct stat Data_Source = {};
 
-    if (stat ("Bite_Code.txt", &Data_Source) != 0)
+    if (stat ("Byte_Code.txt", &Data_Source) != 0)
     {
         return -1;
     }
@@ -317,15 +512,38 @@ int Counter_Int_Number_In_Bite_Code ()
     return Size_Source;
 }
 
-int* Receiving_Bite_Code ()
+int* Receiving_Byte_Code ()
 {
-    int Quantity_Line_Source = Counter_Int_Number_In_Bite_Code ();
+    int Quantity_Line_Source = Counter_Int_Number_In_Byte_Code ();
 
-    int* Buffer_With_Bite_Code = (int*) calloc (Quantity_Line_Source * 2, sizeof (int));
+    int* Buffer_With_Byte_Code = (int*) calloc (Quantity_Line_Source * 2, sizeof (int));
 
-    FILE* File = fopen ("Bite_Code.txt", "r");
-    fread (Buffer_With_Bite_Code, sizeof (int), Quantity_Line_Source * 2, File);
+    FILE* File = fopen ("Byte_Code.txt", "r");
+    fread (Buffer_With_Byte_Code, sizeof (int), Quantity_Line_Source * 2, File);
     fclose (File);
 
-    return Buffer_With_Bite_Code;
+    return Buffer_With_Byte_Code;
+}
+
+int Quantity_Digit (int Number)
+{
+    if (Number < 0)
+    {
+        Number = Number * (-1);
+    }
+
+    if (Number == 0)
+    {
+        return 1;
+    }
+
+    int Quantity = 0;
+
+    while (Number != 0)
+    {
+        Number /= 10;
+        Quantity++;
+    }
+
+    return Quantity;
 }

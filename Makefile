@@ -28,6 +28,6 @@ all:
 clean:
 	@rm -rf a.out
 	@rm -rf b.out
-	@rm -rf Bite_Code.txt
+	@rm -rf Byte_Code.txt
 	@clear
 	@clear

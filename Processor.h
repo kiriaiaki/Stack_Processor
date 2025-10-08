@@ -10,8 +10,16 @@
 struct stack_k
 {
     int* Array;
-    int Size;
+    int Size = 0;
     size_t Capacity;
+};
+
+struct processor_k
+{
+    stack_k Stack;
+    size_t Programme_Counter = 0;
+    int* Array_Byte_Code;
+    int Array_Register[4];
 };
 
 enum Name_Error
@@ -26,19 +34,33 @@ enum Name_Error
 
 const int Canary = 29022008;
 
-int* Receiving_Bite_Code ();
+int* Receiving_Byte_Code ();
+int Quantity_Digit (int Number);
 int Stack_Pop (struct stack_k *Stack);
 int Stack_Add (struct stack_k *Stack);
 int Stack_Sub (struct stack_k *Stack);
 int Stack_Mul (struct stack_k *Stack);
 int Stack_Div (struct stack_k *Stack);
 int Stack_Out (struct stack_k *Stack);
-int Counter_Int_Number_In_Bite_Code ();
-int Stack_Dtor (const struct stack_k *Stack);
+int Counter_Int_Number_In_Byte_Code ();
+int Stack_Dtor (struct stack_k *Stack);
+int Printer_Null_After_Number_2 (int Number);
 int Stack_Error (const struct stack_k *Stack);
 int Stack_Check_Reserve (struct stack_k *Stack);
+int Processor_Ctor (struct processor_k *Processor);
+int Processor_Dtor (struct processor_k *Processor);
+int Processor_Dump (struct processor_k *Processor);
+int Processor_Error (const struct processor_k *Processor);
 int Stack_Push (struct stack_k *Stack, const int Element);
 int Stack_Dump (const stack_k *Stack, const int Stack_Error);
 int Stack_Ctor (struct stack_k *Stack, const size_t Capacity);
+int Stack_Pop_Reg (struct stack_k *Stack, int* Array_Register, size_t Number_Register);
+int Stack_Push_Reg (struct stack_k *Stack, int* Array_Register, size_t Number_Register);
+int Stack_Jump_Below (struct stack_k *Stack, size_t* Now_Cell , size_t First_Repeating_Cell);
+int Stack_Jump_Below_Equal (struct stack_k *Stack, size_t* Now_Cell , size_t First_Repeating_Cell);
+int Stack_Jump_Above (struct stack_k *Stack, size_t* Now_Cell , size_t First_Repeating_Cell);
+int Stack_Jump_Above_Equal (struct stack_k *Stack, size_t* Now_Cell , size_t First_Repeating_Cell);
+int Stack_Jump_Equal (struct stack_k *Stack, size_t* Now_Cell , size_t First_Repeating_Cell);
+int Stack_Jump_Not_Equal (struct stack_k *Stack, size_t* Now_Cell , size_t First_Repeating_Cell);
 
 #endif // PROCESSOR_H

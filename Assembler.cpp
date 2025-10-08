@@ -11,9 +11,9 @@ int main ()
     }
 
     int Quantity_Line_Source = Counter_Symbol_In_Str (Buffer, '\n');
-    int* Buffer_With_Bite_Code = (int*) calloc (Quantity_Line_Source * 2, sizeof (int));
+    int* Buffer_With_Byte_Code = (int*) calloc (Quantity_Line_Source * 2, sizeof (int));
     size_t Position_Last_Slash_N = 0;
-    size_t Position_In_Buffer_With_Bite_Code = 0;
+    size_t Position_In_Buffer_With_Byte_Code = 0;
 
     for (int i = 0; i < Quantity_Line_Source; i++)
     {
@@ -23,40 +23,77 @@ int main ()
         char* Current_Line = Str_From_Buffer_Based_On_Slash_N (Buffer, &Position_Last_Slash_N, Size_Source);
         Number_Command = Read_Task (Current_Line, &Value);
 
-        if (Number_Command == 1)
+        switch (Number_Command)
         {
-            Buffer_With_Bite_Code[Position_In_Buffer_With_Bite_Code] = Number_Command;
-            Position_In_Buffer_With_Bite_Code++;
+            case Bad_Input:
+                break;
+            default:
+                Buffer_With_Byte_Code[Position_In_Buffer_With_Byte_Code] = Number_Command;
+                Position_In_Buffer_With_Byte_Code++;
 
-            Buffer_With_Bite_Code[Position_In_Buffer_With_Bite_Code] = Value;
-            Position_In_Buffer_With_Bite_Code++;
-        }
-
-        if (Number_Command != 1 && Number_Command != -1)
-        {
-            Buffer_With_Bite_Code[Position_In_Buffer_With_Bite_Code] = Number_Command;
-            Position_In_Buffer_With_Bite_Code++;
+                switch (Number_Command)
+                {
+                    case PUSH:
+                        Buffer_With_Byte_Code[Position_In_Buffer_With_Byte_Code] = Value;
+                        Position_In_Buffer_With_Byte_Code++;
+                        break;
+                    case PUSHREG:
+                        Buffer_With_Byte_Code[Position_In_Buffer_With_Byte_Code] = Value;
+                        Position_In_Buffer_With_Byte_Code++;
+                        break;
+                    case POPREG:
+                        Buffer_With_Byte_Code[Position_In_Buffer_With_Byte_Code] = Value;
+                        Position_In_Buffer_With_Byte_Code++;
+                        break;
+                    case JB:
+                        Buffer_With_Byte_Code[Position_In_Buffer_With_Byte_Code] = Value;
+                        Position_In_Buffer_With_Byte_Code++;
+                        break;
+                    case JBE:
+                        Buffer_With_Byte_Code[Position_In_Buffer_With_Byte_Code] = Value;
+                        Position_In_Buffer_With_Byte_Code++;
+                        break;
+                    case JA:
+                        Buffer_With_Byte_Code[Position_In_Buffer_With_Byte_Code] = Value;
+                        Position_In_Buffer_With_Byte_Code++;
+                        break;
+                    case JAE:
+                        Buffer_With_Byte_Code[Position_In_Buffer_With_Byte_Code] = Value;
+                        Position_In_Buffer_With_Byte_Code++;
+                        break;
+                    case JE:
+                        Buffer_With_Byte_Code[Position_In_Buffer_With_Byte_Code] = Value;
+                        Position_In_Buffer_With_Byte_Code++;
+                        break;
+                    case JNE:
+                        Buffer_With_Byte_Code[Position_In_Buffer_With_Byte_Code] = Value;
+                        Position_In_Buffer_With_Byte_Code++;
+                        break;
+                }
         }
 
         free (Current_Line);
     }
 
-    FILE* File_Source = fopen ("Bite_Code.txt", "w");
-    fwrite (Buffer_With_Bite_Code, sizeof (int), Quantity_Line_Source * 2, File_Source);
+    FILE* File_Source = fopen ("Byte_Code.txt", "w");
+    fwrite (Buffer_With_Byte_Code, sizeof (int), Quantity_Line_Source * 2, File_Source);
     fclose (File_Source);
-    
+
     free (Buffer);
-    free (Buffer_With_Bite_Code);
+    free (Buffer_With_Byte_Code);
 
     return 0;
 }
 
-int Read_Task (char* Str_With_Task, int *Value)
+int Read_Task (char* Str_With_Task_And_Value, int *Value)
 {
+    char Str_With_Task[30] = " ";
+    char Str_With_Register[30] = " ";
+    sscanf (Str_With_Task_And_Value, "%s %d", Str_With_Task, Value);
+    sscanf (Str_With_Task_And_Value, "%s %s", Str_With_Task, Str_With_Register);
     //TODO very bad protect input!
-    if (Str_With_Task[0] == 'P' && Str_With_Task[1] == 'U' && Str_With_Task[2] == 'S' && Str_With_Task[3] == 'H')
+    if (strcmp (Str_With_Task, "PUSH") == 0)
     {
-       *Value = atoi (&Str_With_Task[5]);
        return PUSH;
     }
     else if (strcmp (Str_With_Task, "ADD") == 0)
@@ -83,10 +120,82 @@ int Read_Task (char* Str_With_Task, int *Value)
     {
        return HLT;
     }
+    else if (strcmp (Str_With_Task, "PUSHREG") == 0)
+    {
+       if (strcmp (Str_With_Register, "AX") == 0)
+       {
+            *Value = AX;
+            return PUSHREG;
+       }
+       else if (strcmp (Str_With_Register, "BX") == 0)
+       {
+            *Value = BX;
+            return PUSHREG;
+       }
+       else if (strcmp (Str_With_Register, "CX") == 0)
+       {
+            *Value = CX;
+            return PUSHREG;
+       }
+       else if (strcmp (Str_With_Register, "DX") == 0)
+       {
+            *Value = DX;
+            return PUSHREG;
+       }
+    }
+    else if (strcmp (Str_With_Task, "POPREG") == 0)
+    {
+       if (strcmp (Str_With_Register, "AX") == 0)
+       {
+            *Value = AX;
+            return POPREG;
+       }
+       else if (strcmp (Str_With_Register, "BX") == 0)
+       {
+            *Value = BX;
+            return POPREG;
+       }
+       else if (strcmp (Str_With_Register, "CX") == 0)
+       {
+            *Value = CX;
+            return POPREG;
+       }
+       else if (strcmp (Str_With_Register, "DX") == 0)
+       {
+            *Value = DX;
+            return POPREG;
+       }
+    }
+    else if (strcmp (Str_With_Task, "JB") == 0)
+    {
+       *Value = atoi (&Str_With_Task[3]);
+       return JB;
+    }
+    else if (strcmp (Str_With_Task, "JBE") == 0)
+    {
+       return JBE;
+    }
+    else if (strcmp (Str_With_Task, "JA") == 0)
+    {
+       return JA;
+    }
+    else if (strcmp (Str_With_Task, "JAE") == 0)
+    {
+       return JAE;
+    }
+    else if (strcmp (Str_With_Task, "JE") == 0)
+    {
+       return JE;
+    }
+    else if (strcmp (Str_With_Task, "JNE") == 0)
+    {
+       return JNE;
+    }
     else
     {
         return Bad_Input;
     }
+    return 0;
 }
 
 char* Str_From_Buffer_Based_On_Slash_N (char* Buffer, size_t *Position_Last_Slash_N, const size_t Size_Source)
