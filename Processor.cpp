@@ -73,12 +73,21 @@ int main ()
                 Processor.Programme_Counter++;
                 Stack_Jump_Not_Equal (&Processor.Stack, &Processor.Programme_Counter, Value);
                 break;
+            case JMP:
+                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
+                Processor.Programme_Counter++;
+                Stack_Jump (&Processor.Programme_Counter, Value);
+                break;
+            case SQRT:
+                Stack_Sqrt (&Processor.Stack);
+                break;
             case HLT:
                 break;
         }
 
         Processor.Programme_Counter++;
         Current_Number_Command = Processor.Array_Byte_Code[Processor.Programme_Counter];
+        Processor_Dump (&Processor);
     }
 
     Processor_Dtor (&Processor);
@@ -110,14 +119,12 @@ int Processor_Dump (const struct processor_k *Processor)
     Stack_Dump (&Processor->Stack, Stack_Error (&Processor->Stack));
 
     printf ("\nBYTE CODE: ");
-
     for (size_t i = 0; i < Counter_Int_Number_In_Byte_Code (); i++)
     {
         Printer_Null_After_Number_2 (Processor->Array_Byte_Code[i]);
         printf ("%d ",Processor->Array_Byte_Code[i]);
     }
     printf ("\n");
-
     for (size_t i = 0; i < 11 + Processor->Programme_Counter * 3; i++)
     {
         printf (" ");
@@ -148,6 +155,13 @@ int Processor_Ctor (struct processor_k *Processor)
 {
     Stack_Ctor(&Processor->Stack, 5);
     Processor->Array_Byte_Code = Receiving_Byte_Code ();
+
+    return 0;
+}
+
+int Stack_Jump (size_t* Now_Cell , size_t First_Repeating_Cell)
+{
+    *Now_Cell = First_Repeating_Cell - 1;
 
     return 0;
 }
@@ -240,6 +254,15 @@ int Stack_Push_Reg (struct stack_k *Stack, int* Array_Register, size_t Number_Re
 int Stack_Pop_Reg (struct stack_k *Stack,  int* Array_Register, size_t Number_Register)
 {
     Array_Register[Number_Register] = Stack_Out (Stack);
+
+    return 0;
+}
+
+int Stack_Sqrt (struct stack_k *Stack)
+{
+    int A1 = Stack_Out (Stack);
+
+    Stack_Push (Stack, sqrt (A1));
 
     return 0;
 }
@@ -502,7 +525,7 @@ int Counter_Int_Number_In_Byte_Code ()
 {
     struct stat Data_Source = {};
 
-    if (stat ("Byte_Code.txt", &Data_Source) != 0)
+    if (stat (Name_File_Byte_Code, &Data_Source) != 0)
     {
         return -1;
     }
@@ -518,7 +541,7 @@ int* Receiving_Byte_Code ()
 
     int* Buffer_With_Byte_Code = (int*) calloc (Quantity_Line_Source * 2, sizeof (int));
 
-    FILE* File = fopen ("Byte_Code.txt", "r");
+    FILE* File = fopen (Name_File_Byte_Code, "r");
     fread (Buffer_With_Byte_Code, sizeof (int), Quantity_Line_Source * 2, File);
     fclose (File);
 
@@ -527,17 +550,13 @@ int* Receiving_Byte_Code ()
 
 int Quantity_Digit (int Number)
 {
-    if (Number < 0)
+    int Quantity = 0;
+
+    if (Number <= 0)
     {
         Number = Number * (-1);
+        Quantity++;
     }
-
-    if (Number == 0)
-    {
-        return 1;
-    }
-
-    int Quantity = 0;
 
     while (Number != 0)
     {

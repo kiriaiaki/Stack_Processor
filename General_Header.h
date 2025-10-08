@@ -17,6 +17,8 @@ enum Name_Command
     JAE = 12,
     JE = 13,
     JNE = 14,
+    JMP = 15,
+    SQRT = 16,
     HLT = 0,
     Bad_Input = -1
 };
@@ -28,5 +30,9 @@ enum Name_Register
     CX = 2,
     DX = 3
 };
+
+const char Name_File_Byte_Code[] = "Byte_Code.txt";
+
+const char Name_File_Assembler[] = "Square.asm";
 
 #endif // GENERAL_HEADER_H

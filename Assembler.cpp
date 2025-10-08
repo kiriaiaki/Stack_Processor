@@ -69,13 +69,17 @@ int main ()
                         Buffer_With_Byte_Code[Position_In_Buffer_With_Byte_Code] = Value;
                         Position_In_Buffer_With_Byte_Code++;
                         break;
+                    case JMP:
+                        Buffer_With_Byte_Code[Position_In_Buffer_With_Byte_Code] = Value;
+                        Position_In_Buffer_With_Byte_Code++;
+                        break;
                 }
         }
 
         free (Current_Line);
     }
 
-    FILE* File_Source = fopen ("Byte_Code.txt", "w");
+    FILE* File_Source = fopen (Name_File_Byte_Code, "w");
     fwrite (Buffer_With_Byte_Code, sizeof (int), Quantity_Line_Source * 2, File_Source);
     fclose (File_Source);
 
@@ -168,7 +172,6 @@ int Read_Task (char* Str_With_Task_And_Value, int *Value)
     }
     else if (strcmp (Str_With_Task, "JB") == 0)
     {
-       *Value = atoi (&Str_With_Task[3]);
        return JB;
     }
     else if (strcmp (Str_With_Task, "JBE") == 0)
@@ -190,6 +193,14 @@ int Read_Task (char* Str_With_Task_And_Value, int *Value)
     else if (strcmp (Str_With_Task, "JNE") == 0)
     {
        return JNE;
+    }
+    else if (strcmp (Str_With_Task, "JMP") == 0)
+    {
+       return JMP;
+    }
+    else if (strcmp (Str_With_Task, "SQRT") == 0)
+    {
+       return SQRT;
     }
     else
     {
@@ -240,14 +251,14 @@ int Open_File_And_Copying_In_Buffer (char** Buffer, size_t* Size_Source)
 {
     struct stat Data_Source = {};
 
-    if (stat ("Source.asm", &Data_Source) != 0)
+    if (stat (Name_File_Assembler, &Data_Source) != 0)
     {
         return -1;
     }
 
     *Size_Source = Data_Source.st_size;
 
-    const int File_Source = open ("Source.asm", O_RDONLY);
+    const int File_Source = open (Name_File_Assembler, O_RDONLY);
 
     *Buffer = (char*) calloc (*Size_Source, sizeof (char));
 
