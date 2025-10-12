@@ -9,9 +9,15 @@
 #include <sys/stat.h>
 #include "General_Header.h"
 
-int Read_Task (char* Str_With_Task, int *Value);
-int Counter_Symbol_In_Str (const char* const Str, const char Symbol);
-int Open_File_And_Copying_In_Buffer (char** Buffer, size_t* Size_Source);
-char* Str_From_Buffer_Based_On_Slash_N (char* Buffer, size_t *Position_Last_Slash_N, const size_t Size_Source);
+struct label_k
+{
+    char Name_Label[100];
+    int Programme_Counter = -1;
+};
+
+int Open_File_And_Copying_In_Buffer (char** Buffer, ssize_t* Size_File);
+size_t Assembler (label_k* const Array_Labels, size_t* const Counter_Label, int* const Byte_Code, char* const Buffer);
+int Read_Task (const char* const Current_Line, label_k* const Array_Labels, size_t* const Counter_Label, int* Argument, const size_t Len_Current_Line);
+int Comparison_Name_Label (const label_k* const Array_Labels, const size_t Counter_Label, const char* const Name);
 
 #endif // ASSEMBLER_H

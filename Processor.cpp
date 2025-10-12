@@ -36,61 +36,79 @@ int main ()
             case PUSHREG:
                 Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
                 Processor.Programme_Counter++;
-                Stack_Push_Reg (&Processor.Stack, Processor.Array_Register, Value);
+                Stack_Push_Reg (&Processor.Stack, Processor.Array_Register, size_t (Value));
                 break;
             case POPREG:
                 Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
                 Processor.Programme_Counter++;
-                Stack_Pop_Reg (&Processor.Stack, Processor.Array_Register, Value);
+                Stack_Pop_Reg (&Processor.Stack, Processor.Array_Register, size_t (Value));
                 break;
             case JB:
                 Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
                 Processor.Programme_Counter++;
-                Stack_Jump_Below (&Processor.Stack, &Processor.Programme_Counter, Value);
+                Stack_Jump_Below (&Processor.Stack, &Processor.Programme_Counter, size_t (Value));
                 break;
             case JBE:
                 Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
                 Processor.Programme_Counter++;
-                Stack_Jump_Below_Equal (&Processor.Stack, &Processor.Programme_Counter, Value);
+                Stack_Jump_Below_Equal (&Processor.Stack, &Processor.Programme_Counter, size_t (Value));
                 break;
             case JA:
                 Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
                 Processor.Programme_Counter++;
-                Stack_Jump_Above (&Processor.Stack, &Processor.Programme_Counter, Value);
+                Stack_Jump_Above (&Processor.Stack, &Processor.Programme_Counter, size_t (Value));
                 break;
             case JAE:
                 Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
                 Processor.Programme_Counter++;
-                Stack_Jump_Above_Equal (&Processor.Stack, &Processor.Programme_Counter, Value);
+                Stack_Jump_Above_Equal (&Processor.Stack, &Processor.Programme_Counter, size_t (Value));
                 break;
             case JE:
                 Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
                 Processor.Programme_Counter++;
-                Stack_Jump_Equal (&Processor.Stack, &Processor.Programme_Counter, Value);
+                Stack_Jump_Equal (&Processor.Stack, &Processor.Programme_Counter, size_t (Value));
                 break;
             case JNE:
                 Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
                 Processor.Programme_Counter++;
-                Stack_Jump_Not_Equal (&Processor.Stack, &Processor.Programme_Counter, Value);
+                Stack_Jump_Not_Equal (&Processor.Stack, &Processor.Programme_Counter, size_t (Value));
                 break;
             case JMP:
                 Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
                 Processor.Programme_Counter++;
-                Stack_Jump (&Processor.Programme_Counter, Value);
+                Stack_Jump (&Processor.Programme_Counter, size_t (Value));
                 break;
             case SQRT:
                 Stack_Sqrt (&Processor.Stack);
                 break;
+            case IN:
+                Stack_In(&Processor.Stack);
+                break;
             case HLT:
+                break;
+            default:
                 break;
         }
 
         Processor.Programme_Counter++;
         Current_Number_Command = Processor.Array_Byte_Code[Processor.Programme_Counter];
-        Processor_Dump (&Processor);
+
+        //Processor_Dump (&Processor);
+        //getchar ();
+
     }
 
     Processor_Dtor (&Processor);
+    return 0;
+}
+
+int Stack_In (struct stack_k *Stack)
+{
+    int Value = 0;
+    printf ("Value : ");
+    scanf ("%d", &Value);
+    //TODO -5 76t
+    Stack_Push (Stack, Value);
     return 0;
 }
 
@@ -119,7 +137,7 @@ int Processor_Dump (const struct processor_k *Processor)
     Stack_Dump (&Processor->Stack, Stack_Error (&Processor->Stack));
 
     printf ("\nBYTE CODE: ");
-    for (size_t i = 0; i < Counter_Int_Number_In_Byte_Code (); i++)
+    for (size_t i = 0; i < Len_Byte_Code (); i++)
     {
         Printer_Null_After_Number_2 (Processor->Array_Byte_Code[i]);
         printf ("%d ",Processor->Array_Byte_Code[i]);
@@ -262,7 +280,7 @@ int Stack_Sqrt (struct stack_k *Stack)
 {
     int A1 = Stack_Out (Stack);
 
-    Stack_Push (Stack, sqrt (A1));
+    Stack_Push (Stack, int (sqrt (A1)));
 
     return 0;
 }
@@ -334,11 +352,11 @@ int Stack_Dump (const stack_k *Stack, const int Stack_Error)
 
         if (Stack_Error == Bad_Size)
         {
-            printf ("    Size = %d (bad size!)\n", Stack->Size);
+            printf ("    Size = %zu (bad size!)\n", Stack->Size);
         }
         else
         {
-            printf ("    Size = %d\n", Stack->Size);
+            printf ("    Size = %zu\n", Stack->Size);
         }
 
         if (Stack_Error == Bad_Capacity)
@@ -521,31 +539,31 @@ int Stack_Check_Reserve (struct stack_k *Stack)
     return 0;
 }
 
-int Counter_Int_Number_In_Byte_Code ()
+size_t Len_Byte_Code ()
 {
-    struct stat Data_Source = {};
+    struct stat Data_File_Byte_Code = {};
 
-    if (stat (Name_File_Byte_Code, &Data_Source) != 0)
+    if (stat (Name_File_Byte_Code, &Data_File_Byte_Code) != 0)
     {
-        return -1;
+        return 0;
     }
 
-    int Size_Source = Data_Source.st_size / sizeof(int);
+    size_t Len_Byte_Code = size_t (Data_File_Byte_Code.st_size) / sizeof(int);
 
-    return Size_Source;
+    return Len_Byte_Code;
 }
 
 int* Receiving_Byte_Code ()
 {
-    int Quantity_Line_Source = Counter_Int_Number_In_Byte_Code ();
+    size_t Len = Len_Byte_Code ();
 
-    int* Buffer_With_Byte_Code = (int*) calloc (Quantity_Line_Source * 2, sizeof (int));
+    int* Byte_Code = (int*) calloc (Len , sizeof (int));
 
     FILE* File = fopen (Name_File_Byte_Code, "r");
-    fread (Buffer_With_Byte_Code, sizeof (int), Quantity_Line_Source * 2, File);
+    fread (Byte_Code, sizeof (int), Len, File);
     fclose (File);
 
-    return Buffer_With_Byte_Code;
+    return Byte_Code;
 }
 
 int Quantity_Digit (int Number)

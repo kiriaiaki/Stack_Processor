@@ -11,7 +11,7 @@
 struct stack_k
 {
     int* Array;
-    int Size = 0;
+    size_t Size = 0;
     size_t Capacity;
 };
 
@@ -35,8 +35,10 @@ enum Name_Error
 
 const int Canary = 29022008;
 
+size_t Len_Byte_Code ();
 int* Receiving_Byte_Code ();
 int Quantity_Digit (int Number);
+int Stack_In (struct stack_k *Stack);
 int Stack_Pop (struct stack_k *Stack);
 int Stack_Add (struct stack_k *Stack);
 int Stack_Sub (struct stack_k *Stack);
@@ -44,7 +46,6 @@ int Stack_Mul (struct stack_k *Stack);
 int Stack_Div (struct stack_k *Stack);
 int Stack_Out (struct stack_k *Stack);
 int Stack_Sqrt (struct stack_k *Stack);
-int Counter_Int_Number_In_Byte_Code ();
 int Stack_Dtor (struct stack_k *Stack);
 int Printer_Null_After_Number_2 (int Number);
 int Stack_Error (const struct stack_k *Stack);

@@ -19,6 +19,8 @@ enum Name_Command
     JNE = 14,
     JMP = 15,
     SQRT = 16,
+    LABEL = 17,
+    IN = 18,
     HLT = 0,
     Bad_Input = -1
 };

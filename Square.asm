@@ -1,9 +1,16 @@
-PUSH 1 // a * x^2
+IN // a * x^2
 POPREG AX
-PUSH -6 // b * x^1
+
+IN // b * x^1
 POPREG BX
-PUSH 5 // c * x^0
+
+IN // c * x^0
 POPREG CX
+
+PUSHREG AX
+PUSH 0
+JE :A_Below_Null
+
 PUSHREG BX
 PUSHREG BX
 MUL
@@ -14,16 +21,21 @@ MUL
 MUL
 SUB
 POPREG DX // discriminant
+
 PUSHREG DX
 PUSH 0
-JE 46 // if discriminant = 0
+JE :One_Solve
+
 PUSHREG DX
 PUSH 0
-JB 63 // if discriminant < 0
+JB :Zero_Solve
+
 PUSHREG DX
 PUSH 0
-JA 68 // else (if discriminant > 0)
-PUSH 1 // programme counter - 46 47 (1 solve)
+JA :Two_Solve
+
+:One_Solve
+PUSH 1
 OUT
 PUSH -1
 PUSHREG BX
@@ -33,11 +45,15 @@ PUSH 2
 MUL
 DIV
 OUT
-JMP 105 // finish
-PUSH 0 // programme counter - 63 64 (0 solve)
+JMP :Finish
+
+:Zero_Solve
+PUSH 0
 OUT
-JMP 105 // finish
-PUSH 2 // programme counter - 68 69 (2 solve)
+JMP :Finish
+
+:Two_Solve
+PUSH 2
 OUT
 PUSH -1
 PUSHREG BX
@@ -61,5 +77,16 @@ PUSHREG AX
 MUL
 DIV
 OUT
-JMP 105 // finish
-HLT // programme counter - 105 (end)
+JMP :Finish
+
+:A_Null
+PUSH -1
+PUSHREG CX
+MUL
+PUSHREG BX
+DIV
+OUT
+JMP :Finish
+
+:Finish
+HLT 
