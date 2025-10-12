@@ -584,3 +584,4 @@ int Quantity_Digit (int Number)
 
     return Quantity;
 }
+
