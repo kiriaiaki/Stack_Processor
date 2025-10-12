@@ -18,7 +18,7 @@ struct stack_k
 struct processor_k
 {
     stack_k Stack;
-    size_t Programme_Counter = 0;
+    size_t Programme_Counter = 3;
     int* Array_Byte_Code;
     int Array_Register[4];
 };
@@ -33,8 +33,16 @@ enum Name_Error
     Bad_Canary = 5
 };
 
+enum Work_Byte_Code
+{
+    Password = 29022008,
+    Version = 'V',
+    Number_Version_Processor = 1
+};
+
 const int Canary = 29022008;
 
+int Verifier_Byte_Code (struct processor_k *Processor);
 size_t Len_Byte_Code ();
 int* Receiving_Byte_Code ();
 int Quantity_Digit (int Number);

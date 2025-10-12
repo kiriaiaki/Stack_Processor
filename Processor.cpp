@@ -3,7 +3,10 @@
 int main ()
 {
     struct processor_k Processor = {};
-    Processor_Ctor (&Processor);
+    if (Processor_Ctor (&Processor) == -1)
+    {
+        return 0;
+    }
 
     int Current_Number_Command = Processor.Array_Byte_Code[Processor.Programme_Counter];
 
@@ -137,7 +140,7 @@ int Processor_Dump (const struct processor_k *Processor)
     Stack_Dump (&Processor->Stack, Stack_Error (&Processor->Stack));
 
     printf ("\nBYTE CODE: ");
-    for (size_t i = 0; i < Len_Byte_Code (); i++)
+    for (size_t i = 3; i < Len_Byte_Code (); i++)
     {
         Printer_Null_After_Number_2 (Processor->Array_Byte_Code[i]);
         printf ("%d ",Processor->Array_Byte_Code[i]);
@@ -173,6 +176,11 @@ int Processor_Ctor (struct processor_k *Processor)
 {
     Stack_Ctor(&Processor->Stack, 5);
     Processor->Array_Byte_Code = Receiving_Byte_Code ();
+
+    if (Verifier_Byte_Code (Processor) == -1)
+    {
+        return -1;
+    }
 
     return 0;
 }
@@ -557,7 +565,7 @@ int* Receiving_Byte_Code ()
 {
     size_t Len = Len_Byte_Code ();
 
-    int* Byte_Code = (int*) calloc (Len , sizeof (int));
+    int* Byte_Code = (int*) calloc (Len, sizeof (int));
 
     FILE* File = fopen (Name_File_Byte_Code, "r");
     fread (Byte_Code, sizeof (int), Len, File);
@@ -585,3 +593,29 @@ int Quantity_Digit (int Number)
     return Quantity;
 }
 
+int Verifier_Byte_Code (struct processor_k *Processor)
+{
+    if (Processor->Array_Byte_Code[0] != Password)
+    {
+        printf ("!START ERROR! This byte code created not my assembler\n");
+        return -1;
+    }
+
+    if (Processor->Array_Byte_Code[1] != Version)
+    {
+        printf ("!START ERROR! This byte code created not my assembler\n");
+        return -1;
+    }
+
+    if (Processor->Array_Byte_Code[2] > Number_Version_Processor)
+    {
+        printf ("!START ERROR! Version Assembler newer than Version Processor\n");
+        return -1;
+    }
+    else if (Processor->Array_Byte_Code[2] < Number_Version_Processor)
+    {
+        printf ("!POSSIBLE BUGS! Version Processor newer than Version Assembler\n");
+    }
+
+    return 0;
+}

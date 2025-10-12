@@ -25,12 +25,13 @@ enum Name_Command
     Bad_Input = -1
 };
 
-enum Name_Register
+enum Name_Registers
 {
     AX = 0,
     BX = 1,
     CX = 2,
-    DX = 3
+    DX = 3,
+    Quantity_Registers = 4
 };
 
 const char Name_File_Byte_Code[] = "Byte_Code.txt";

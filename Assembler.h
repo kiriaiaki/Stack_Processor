@@ -9,6 +9,13 @@
 #include <sys/stat.h>
 #include "General_Header.h"
 
+enum Work_Byte_Code
+{
+    Password = 29022008,
+    Version = 'V',
+    Number_Version_Assembler = 1
+};
+
 struct label_k
 {
     char* Name_Label;
@@ -24,9 +31,9 @@ struct array_labels_k
 
 struct byte_code_k
 {
-    int* Ptr_Byte_Code = (int*) calloc (2, sizeof (int));
-    size_t Counter_Byte_Code = 0;
-    size_t Len_Byte_Code = 2;
+    int* Ptr_Byte_Code = (int*) calloc (5, sizeof (int));
+    size_t Counter_Byte_Code = 3;
+    size_t Len_Byte_Code = 5;
 };
 
 char* Open_File_And_Copying_In_Buffer ();

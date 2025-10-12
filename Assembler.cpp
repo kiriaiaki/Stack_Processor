@@ -10,6 +10,10 @@ int main ()
     }
 
     struct byte_code_k Byte_Code = {};
+    Byte_Code.Ptr_Byte_Code[0] = Password;
+    Byte_Code.Ptr_Byte_Code[1] = Version;
+    Byte_Code.Ptr_Byte_Code[2] = Number_Version_Assembler;
+
     struct array_labels_k Array_Labels = {};
 
     Assembler (&Array_Labels, &Byte_Code, Buffer);
@@ -23,7 +27,6 @@ int main ()
     free (Buffer);
     free (Byte_Code.Ptr_Byte_Code);
     Array_Labels_Dtor (&Array_Labels);
-
     return 0;
 }
 
