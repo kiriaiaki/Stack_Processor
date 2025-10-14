@@ -20,7 +20,7 @@ struct processor_k
     stack_k Stack;
     size_t Programme_Counter = 3;
     int* Array_Byte_Code;
-    int Array_Register[4];
+    int Array_Register[Quantity_Registers];
 };
 
 enum Name_Error

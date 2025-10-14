@@ -29,13 +29,13 @@ int main ()
     Array_Labels.Ptr_Array_Labels[0].Programme_Counter = -1;
     Array_Labels.Counter_Array_Labels++;
 
-    if (Assembler (&Array_Labels, &Byte_Code, Buffer) == There_Are_Errors)
+    if (Assembly (&Array_Labels, &Byte_Code, Buffer) == There_Are_Errors)
     {
         printf ("!ASSEMBLER NOT FINISH!\n");
         return 0;
     }
     Byte_Code.Counter_Byte_Code = 3;
-    if (Assembler (&Array_Labels, &Byte_Code, Buffer) == There_Are_Errors)
+    if (Assembly (&Array_Labels, &Byte_Code, Buffer) == There_Are_Errors)
     {
         printf ("!ASSEMBLER NOT FINISH!\n");
         return 0;
@@ -67,7 +67,7 @@ int main ()
     return 0;
 }
 
-int Assembler (array_labels_k* const Array_Labels, byte_code_k* const Byte_Code, char* const Buffer)
+int Assembly (array_labels_k* const Array_Labels, byte_code_k* const Byte_Code, char* const Buffer)
 {
     size_t i = 0;
     char* Ptr_Last_Slash_N = Buffer;

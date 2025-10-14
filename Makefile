@@ -17,12 +17,16 @@ DED_FLAGS := -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ \
 all:
 	@$(CC) Assembler.cpp $(DED_FLAGS) -o a.out
 	@./a.out
-	@$(CC) Processor.cpp $(DED_FLAGS) -o b.out
+	@$(CC) Disassembler.cpp $(DED_FLAGS) -o b.out
 	@./b.out
+	@$(CC) Processor.cpp $(DED_FLAGS) -o c.out
+	@./c.out
 
 clean:
 	@rm -rf a.out
 	@rm -rf b.out
+	@rm -rf c.out
+	@rm -rf disassembler.asm
 	@rm -rf Byte_Code.txt
 	@clear
 	@clear

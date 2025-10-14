@@ -39,7 +39,7 @@ struct byte_code_k
 const int There_Are_Errors = -2902;
 
 char* Open_File_And_Copying_In_Buffer ();
-int Assembler (array_labels_k* const Array_Labels, byte_code_k* const Byte_code, char* const Buffer);
+int Assembly (array_labels_k* const Array_Labels, byte_code_k* const Byte_code, char* const Buffer);
 int Read_Task (const char* const Current_Line, const size_t Len_Current_Line);
 int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line, const int Number_Command, array_labels_k* const Array_Labels);
 int Append_Argument (byte_code_k* const Byte_Code, const int Value, const int Number_Command, array_labels_k* const Array_Labels);
