@@ -16,8 +16,8 @@ DED_FLAGS := -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ \
 
 all:
 	@$(CC) Assembler.cpp $(DED_FLAGS) -o a.out
-	@$(CC) Processor.cpp $(DED_FLAGS) -o b.out
 	@./a.out
+	@$(CC) Processor.cpp $(DED_FLAGS) -o b.out
 	@./b.out
 
 clean:

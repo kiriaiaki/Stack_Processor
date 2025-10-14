@@ -19,7 +19,7 @@ enum Work_Byte_Code
 struct label_k
 {
     char* Name_Label;
-    int Programme_Counter = -1;
+    int Programme_Counter;
 };
 
 struct array_labels_k
@@ -44,6 +44,7 @@ int Read_Task (const char* const Current_Line, const size_t Len_Current_Line);
 int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line, const int Number_Command, array_labels_k* const Array_Labels);
 int Append_Argument (byte_code_k* const Byte_Code, const int Value, const int Number_Command, array_labels_k* const Array_Labels);
 int Read_Label (const char* const Current_Line, const size_t Len_Current_Line, array_labels_k* const Array_Labels);
+int Check_Correct_Label (byte_code_k* const Byte_Code);
 int Append_In_Byte_Code (byte_code_k* const Byte_Code, int Value);
 int Comparison_Name_Label (const array_labels_k* const Array_Labels, const char* const Name);
 int Array_Labels_Check_Reserve (array_labels_k* const Array_Labels);

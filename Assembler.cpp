@@ -24,30 +24,43 @@ int main ()
         printf ("!NOT START ASSEMBLER! Error allocating memory for array labels\n");
         return 0;
     }
+    Array_Labels.Ptr_Array_Labels[0].Name_Label = (char*) calloc (10, sizeof (char));
+    strcpy (Array_Labels.Ptr_Array_Labels[0].Name_Label, "Not_Find");
+    Array_Labels.Ptr_Array_Labels[0].Programme_Counter = -1;
+    Array_Labels.Counter_Array_Labels++;
 
     if (Assembler (&Array_Labels, &Byte_Code, Buffer) == There_Are_Errors)
     {
+        printf ("!ASSEMBLER NOT FINISH!\n");
         return 0;
     }
     Byte_Code.Counter_Byte_Code = 3;
     if (Assembler (&Array_Labels, &Byte_Code, Buffer) == There_Are_Errors)
     {
+        printf ("!ASSEMBLER NOT FINISH!\n");
         return 0;
     }
 
+    if (Check_Correct_Label (&Byte_Code) == There_Are_Errors)
+    {
+        printf ("!ASSEMBLER NOT FINISH!\n");
+        return 0;
+    }
     FILE* File_Byte_Code = fopen (Name_File_Byte_Code, "w");
     if (File_Byte_Code == NULL)
     {
-        printf ("!ERROR IN ASSEMBLER! Error opening file for byte code\n");
+        printf ("!ASSEMBLER NOT FINISH!\n Error opening file for byte code\n");
         return 0;
 
     }
     if (fwrite (Byte_Code.Ptr_Byte_Code, sizeof (int), Byte_Code.Counter_Byte_Code, File_Byte_Code) < Byte_Code.Counter_Byte_Code)
     {
-        printf ("!ERROR IN ASSEMBLER! Error writing in file for byte code\n");
+        printf ("!ASSEMBLER NOT FINISH!\n Error writing in file for byte code\n");
+        return 0;
     }
     fclose (File_Byte_Code);
 
+    printf ("Compilation was successful!\n");
     free (Buffer);
     free (Byte_Code.Ptr_Byte_Code);
     Array_Labels_Dtor (&Array_Labels);
@@ -79,17 +92,12 @@ int Assembler (array_labels_k* const Array_Labels, byte_code_k* const Byte_Code,
             switch (Number_Command)
             {
                 case Bad_Input:
-                    for (size_t k = 0; k < Len_Current_Line; i++)
+                    for (size_t k = 0; k < Len_Current_Line - 1; k++)
                     {
-                        if (Current_Line[k] == '\0')
-                        {
-                            break;
-                        }
-
                         if (Current_Line[k] != ' ')
                         {
-                            printf ("This string <%s> incorrect\n"
-                                "now programme counter = %zu\n", Current_Line, Byte_Code->Counter_Byte_Code);
+                            printf ("<%s> This string incorrect\n"
+                                    "now programme counter = %zu\n", Current_Line, Byte_Code->Counter_Byte_Code);
                             return There_Are_Errors;
                         }
                     }
@@ -126,6 +134,69 @@ int Assembler (array_labels_k* const Array_Labels, byte_code_k* const Byte_Code,
         }
 
         i++;
+    }
+
+    return 0;
+}
+
+int Check_Correct_Label (byte_code_k* const Byte_Code)
+{
+    for (size_t i = 3; i < Byte_Code->Counter_Byte_Code - 1; i++)
+    {
+        switch (Byte_Code->Ptr_Byte_Code[i])
+        {
+            case JB:
+                if (Byte_Code->Ptr_Byte_Code[i + 1] == -1)
+                {
+                    printf ("You have JB with programme counter <%zu> on incorrect label\n", i);
+                    return There_Are_Errors;
+                }
+                break;
+            case JBE:
+                if (Byte_Code->Ptr_Byte_Code[i + 1] == -1)
+                {
+                    printf ("You have JBE with programme counter <%zu> on incorrect label\n", i);
+                    return There_Are_Errors;
+                }
+                break;
+            case JA:
+                if (Byte_Code->Ptr_Byte_Code[i + 1] == -1)
+                {
+                    printf ("You have JA with programme counter <%zu> on incorrect label\n", i);
+                    return There_Are_Errors;
+                }
+                break;
+            case JAE:
+                if (Byte_Code->Ptr_Byte_Code[i + 1] == -1)
+                {
+                    printf ("You have JAE with programme counter <%zu> on incorrect label\n", i);
+                    return There_Are_Errors;
+                }
+                break;
+            case JE:
+                if (Byte_Code->Ptr_Byte_Code[i + 1] == -1)
+                {
+                    printf ("You have JE with programme counter <%zu> on incorrect label\n", i);
+                    return There_Are_Errors;
+                }
+                break;
+            case JNE:
+                if (Byte_Code->Ptr_Byte_Code[i + 1] == -1)
+                {
+                    printf ("You have JNE with programme counter <%zu> on incorrect label\n", i);
+                    return There_Are_Errors;
+                }
+                break;
+            case JMP:
+                if (Byte_Code->Ptr_Byte_Code[i + 1] == -1)
+                {
+                    printf ("You have JMP with programme counter <%zu> on incorrect label\n", i);
+                    return There_Are_Errors;
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     return 0;
@@ -258,7 +329,7 @@ int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line
                     }
                     else
                     {
-                        printf ("This string <%s> incorrect, argument push not a number\n", Current_Line);
+                        printf ("<%s> \nThis string incorrect, argument push not a number\n", Current_Line);
                         return There_Are_Errors;
                     }
                 }
@@ -284,7 +355,7 @@ int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line
             }
             else
             {
-                printf ("This string <%s> incorrect, this register doesn't exist\n", Current_Line);
+                printf ("<%s> \n This string incorrect, this register doesn't exist\n", Current_Line);
                 return There_Are_Errors;
             }
             break;
@@ -307,7 +378,7 @@ int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line
             }
             else
             {
-                printf ("This string <%s> incorrect, this register doesn't exist\n", Current_Line);
+                printf ("<%s> \n This string incorrect, this register doesn't exist\n", Current_Line);
                 return There_Are_Errors;
             }
             break;
@@ -318,7 +389,7 @@ int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line
             }
             else
             {
-                printf ("This string <%s> incorrect, label must begin :\n", Current_Line);
+                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
                 return There_Are_Errors;
             }
             break;
@@ -329,7 +400,7 @@ int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line
             }
             else
             {
-                printf ("This string <%s> incorrect, label must begin :\n", Current_Line);
+                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
                 return There_Are_Errors;
             }
             break;
@@ -340,7 +411,7 @@ int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line
             }
             else
             {
-                printf ("This string <%s> incorrect, label must begin :\n", Current_Line);
+                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
                 return There_Are_Errors;
             }
             break;
@@ -351,7 +422,7 @@ int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line
             }
             else
             {
-                printf ("This string <%s> incorrect, label must begin :\n", Current_Line);
+                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
                 return There_Are_Errors;
             }
             break;
@@ -362,7 +433,7 @@ int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line
             }
             else
             {
-                printf ("This string <%s> incorrect, label must begin :\n", Current_Line);
+                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
                 return There_Are_Errors;
             }
             break;
@@ -373,7 +444,7 @@ int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line
             }
             else
             {
-                printf ("This string <%s> incorrect, label must begin :\n", Current_Line);
+                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
                 return There_Are_Errors;
             }
             break;
@@ -384,7 +455,7 @@ int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line
             }
             else
             {
-                printf ("This string <%s> incorrect, label must begin :\n", Current_Line);
+                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
                 return There_Are_Errors;
             }
             break;
@@ -477,7 +548,7 @@ int Read_Label (const char* const Current_Line, const size_t Len_Current_Line, a
 
     int Number_Label = Comparison_Name_Label (Array_Labels, &Str_With_Label[1]);
 
-    if (Number_Label == -1)
+    if (Number_Label == 0)
     {
         Array_Labels_Check_Reserve (Array_Labels);
 
@@ -487,7 +558,6 @@ int Read_Label (const char* const Current_Line, const size_t Len_Current_Line, a
         Array_Labels->Counter_Array_Labels++;
         free (Str_With_Label);
         return int(Array_Labels->Counter_Array_Labels) - 1;
-
     }
 
     else
@@ -549,7 +619,7 @@ char* Open_File_And_Copying_In_Buffer ()
 
 int Comparison_Name_Label (const array_labels_k* const Array_Labels, const char* const Name)
 {
-    for (size_t i = 0; i < Array_Labels->Counter_Array_Labels; i++)
+    for (size_t i = 1; i < Array_Labels->Counter_Array_Labels; i++)
     {
         if (strcmp (Array_Labels->Ptr_Array_Labels[i].Name_Label, Name) == 0)
         {
@@ -557,7 +627,7 @@ int Comparison_Name_Label (const array_labels_k* const Array_Labels, const char*
         }
     }
 
-    return -1;
+    return 0;
 }
 
 int Array_Labels_Check_Reserve (array_labels_k* const Array_Labels)
