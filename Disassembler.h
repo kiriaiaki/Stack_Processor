@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <sys/stat.h>
 #include "General_Header.h"
 
