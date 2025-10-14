@@ -79,7 +79,7 @@ DIV
 OUT
 JMP :Finish
 
-:A_Null
+:A_Below_Null
 PUSH -1
 PUSHREG CX
 MUL
@@ -89,4 +89,4 @@ OUT
 JMP :Finish
 
 :Finish
-HLT 
+HLT
