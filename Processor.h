@@ -23,14 +23,23 @@ struct processor_k
     int Array_Register[Quantity_Registers];
 };
 
-enum Name_Error
+enum Name_Error_Stack
 {
-    Not_Error = 0,
+    Not_Error_Stack = 0,
     Not_Struct_Stack = 1,
     Not_Array_Stack = 2,
     Capacity_Null = 3,
     Bad_Size = 4,
     Bad_Canary = 5
+};
+
+enum Name_Error_Processor
+{
+    Not_Error_Processor = 0,
+    Error_Stack = 1,
+    Error_Byte_Code = 2,
+    Error_Programme_Counter = 3,
+    Error_Ver_Byte_Code = 4
 };
 
 enum Work_Byte_Code
@@ -44,6 +53,7 @@ const int Canary = 29022008;
 
 const int There_Are_Errors = -2902;
 
+int Run (struct processor_k* const Processor);
 int Processor_Ctor (struct processor_k* const Processor);
 int Processor_Dump (const struct processor_k* const Processor);
 int Processor_Error (const struct processor_k* const Processor);

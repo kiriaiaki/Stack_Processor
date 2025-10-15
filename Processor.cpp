@@ -5,104 +5,193 @@ int main ()
     struct processor_k Processor = {};
     if (Processor_Ctor (&Processor) == There_Are_Errors)
     {
+        Processor_Dump (&Processor);
         printf ("!NOT START PROCESSOR!\n");
         return 0;
     }
 
-    int Current_Number_Command = Processor.Array_Byte_Code[Processor.Programme_Counter];
+    if (Run (&Processor) == There_Are_Errors)
+    {
+        Processor_Dump (&Processor);
+        printf ("!NOT FINISH PROCESSOR!\n");
+        return 0;
+    }
+
+    Processor_Dtor (&Processor);
+    return 0;
+}
+
+int Run (struct processor_k* const Processor)
+{
+    int Current_Number_Command = Processor->Array_Byte_Code[Processor->Programme_Counter];
 
     while (Current_Number_Command != HLT)
     {
         int Value = 0;
+        int Argument_For_Print = 0;
 
         switch (Current_Number_Command)
         {
             case PUSH:
-                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
-                Processor.Programme_Counter++;
-                Stack_Push (&Processor.Stack, Value);
+                Processor->Programme_Counter++;
+                Value = Processor->Array_Byte_Code[Processor->Programme_Counter];
+
+                if (Stack_Push (&Processor->Stack, Value) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case ADD:
-                Stack_Add (&Processor.Stack);
+                if (Stack_Add (&Processor->Stack) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case SUB:
-                Stack_Sub (&Processor.Stack);
+                if (Stack_Sub (&Processor->Stack) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case MUL:
-                Stack_Mul (&Processor.Stack);
+                if (Stack_Mul (&Processor->Stack) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case DIV:
-                Stack_Div (&Processor.Stack);
+                if (Stack_Div (&Processor->Stack) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case OUT:
-                printf ("%d\n", Stack_Out (&Processor.Stack));
+                Argument_For_Print = Stack_Out (&Processor->Stack);
+                if (Argument_For_Print == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
+                printf ("%d\n", Argument_For_Print);
                 break;
             case PUSHREG:
-                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
-                Processor.Programme_Counter++;
-                Stack_Push_Reg (&Processor.Stack, Processor.Array_Register, size_t (Value));
+                Processor->Programme_Counter++;
+                Value = Processor->Array_Byte_Code[Processor->Programme_Counter];
+
+                if (Stack_Push_Reg (&Processor->Stack, Processor->Array_Register, size_t (Value)) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case POPREG:
-                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
-                Processor.Programme_Counter++;
-                Stack_Pop_Reg (&Processor.Stack, Processor.Array_Register, size_t (Value));
+                Processor->Programme_Counter++;
+                Value = Processor->Array_Byte_Code[Processor->Programme_Counter];
+
+                if (Stack_Pop_Reg (&Processor->Stack, Processor->Array_Register, size_t (Value)) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case JB:
-                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
-                Processor.Programme_Counter++;
-                Stack_Jump_Below (&Processor.Stack, &Processor.Programme_Counter, size_t (Value));
+                Processor->Programme_Counter++;
+                Value = Processor->Array_Byte_Code[Processor->Programme_Counter];
+
+                if (Stack_Jump_Below (&Processor->Stack, &Processor->Programme_Counter, size_t (Value)) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case JBE:
-                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
-                Processor.Programme_Counter++;
-                Stack_Jump_Below_Equal (&Processor.Stack, &Processor.Programme_Counter, size_t (Value));
+                Processor->Programme_Counter++;
+                Value = Processor->Array_Byte_Code[Processor->Programme_Counter];
+
+                if (Stack_Jump_Below_Equal (&Processor->Stack, &Processor->Programme_Counter, size_t (Value)) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case JA:
-                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
-                Processor.Programme_Counter++;
-                Stack_Jump_Above (&Processor.Stack, &Processor.Programme_Counter, size_t (Value));
+                Processor->Programme_Counter++;
+                Value = Processor->Array_Byte_Code[Processor->Programme_Counter];
+
+                if (Stack_Jump_Above (&Processor->Stack, &Processor->Programme_Counter, size_t (Value)) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case JAE:
-                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
-                Processor.Programme_Counter++;
-                Stack_Jump_Above_Equal (&Processor.Stack, &Processor.Programme_Counter, size_t (Value));
+                Processor->Programme_Counter++;
+                Value = Processor->Array_Byte_Code[Processor->Programme_Counter];
+
+                if (Stack_Jump_Above_Equal (&Processor->Stack, &Processor->Programme_Counter, size_t (Value)) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case JE:
-                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
-                Processor.Programme_Counter++;
-                Stack_Jump_Equal (&Processor.Stack, &Processor.Programme_Counter, size_t (Value));
+                Processor->Programme_Counter++;
+                Value = Processor->Array_Byte_Code[Processor->Programme_Counter];
+
+                if (Stack_Jump_Equal (&Processor->Stack, &Processor->Programme_Counter, size_t (Value)) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case JNE:
-                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
-                Processor.Programme_Counter++;
-                Stack_Jump_Not_Equal (&Processor.Stack, &Processor.Programme_Counter, size_t (Value));
+                Processor->Programme_Counter++;
+                Value = Processor->Array_Byte_Code[Processor->Programme_Counter];
+
+                if (Stack_Jump_Not_Equal (&Processor->Stack, &Processor->Programme_Counter, size_t (Value)) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case JMP:
-                Value = Processor.Array_Byte_Code[Processor.Programme_Counter + 1];
-                Processor.Programme_Counter++;
-                Stack_Jump (&Processor.Programme_Counter, size_t (Value));
+                Processor->Programme_Counter++;
+                Value = Processor->Array_Byte_Code[Processor->Programme_Counter];
+
+                if (Stack_Jump (&Processor->Programme_Counter, size_t (Value)) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case SQRT:
-                Stack_Sqrt (&Processor.Stack);
+                if (Stack_Sqrt (&Processor->Stack) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case IN:
-                Stack_In(&Processor.Stack);
+                if (Stack_In(&Processor->Stack) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
                 break;
             case HLT:
                 break;
             default:
-                break;
+                printf ("Incorrect number comand\n");
+                return There_Are_Errors;
         }
 
-        Processor.Programme_Counter++;
-        Current_Number_Command = Processor.Array_Byte_Code[Processor.Programme_Counter];
+        if (Processor_Error (Processor) != Not_Error_Processor)
+        {
+            Processor_Dump (Processor);
+            return There_Are_Errors;
+        }
 
-        //Processor_Dump (&Processor);
-        //getchar ();
+        Processor->Programme_Counter++;
+        Current_Number_Command = Processor->Array_Byte_Code[Processor->Programme_Counter];
 
+        if (Processor_Error (Processor) != Not_Error_Processor)
+        {
+            Processor_Dump (Processor);
+            return There_Are_Errors;
+        }
+
+        // Processor_Dump (Processor);
+        // getchar ();
     }
 
-    Processor_Dtor (&Processor);
     return 0;
 }
 
@@ -131,8 +220,27 @@ int Stack_In (struct stack_k* const Stack)
 
 int Processor_Error (const struct processor_k* const Processor)
 {
-    //TODO write
-    return 0;
+    if (Stack_Error (&Processor->Stack) != Not_Error_Stack)
+    {
+        return Error_Stack;
+    }
+
+    if (Processor->Array_Byte_Code == NULL)
+    {
+        return Error_Byte_Code;
+    }
+
+    if (Processor->Programme_Counter < 3)
+    {
+        return Error_Programme_Counter;
+    }
+
+    if (Verifier_Byte_Code (Processor) != 0)
+    {
+        return Error_Ver_Byte_Code;
+    }
+
+    return Not_Error_Processor;
 }
 
 int Processor_Dtor (struct processor_k* const Processor)
@@ -149,6 +257,8 @@ int Processor_Dtor (struct processor_k* const Processor)
 
 int Processor_Dump (const struct processor_k* const Processor)
 {
+    int Processor_Err = Processor_Error (Processor);
+    //TODO сделать выводы под случаи ошибок
     printf ("\n----------------------------------------------------\n");
     printf ("\nSTACK:\n");
 
@@ -168,7 +278,7 @@ int Processor_Dump (const struct processor_k* const Processor)
     for (size_t i = 3; i < Len; i++)
     {
         //printf ("%4-Quantity_Digit(Processor->Array_Byte_Code[i])d", 0);
-        printf ("%d", Processor->Array_Byte_Code[i]);
+        printf ("%d ", Processor->Array_Byte_Code[i]);
     }
     printf ("\n");
 
@@ -203,12 +313,13 @@ int Processor_Ctor (struct processor_k* const Processor)
         return There_Are_Errors;
     }
 
-    if (Verifier_Byte_Code (Processor) == There_Are_Errors)
+    Processor->Programme_Counter = 3;
+
+    if (Processor_Error (Processor) != Not_Error_Processor)
     {
+        Processor_Dump (Processor);
         return There_Are_Errors;
     }
-
-    Processor->Programme_Counter = 3;
 
     return 0;
 }
@@ -622,7 +733,7 @@ int Stack_Error (const struct stack_k* const Stack)
         return Bad_Canary;
     }
 
-    return Not_Error;
+    return Not_Error_Stack;
 }
 
 int Stack_Dtor (struct stack_k* const Stack)
@@ -649,7 +760,7 @@ int Stack_Ctor (struct stack_k* const Stack, const size_t Capacity)
 
     Stack->Size = 0;
 
-    if (Stack_Error (Stack) != Not_Error)
+    if (Stack_Error (Stack) != Not_Error_Stack)
     {
         Stack_Dump (Stack);
         printf ("Error in Stack_Ctor\n\n");
@@ -661,7 +772,7 @@ int Stack_Ctor (struct stack_k* const Stack, const size_t Capacity)
 
 int Stack_Pop (struct stack_k* const Stack)
 {
-    if (Stack_Error (Stack) != Not_Error)
+    if (Stack_Error (Stack) != Not_Error_Stack)
     {
         Stack_Dump (Stack);
         printf ("Error in start Stack_Pop\n\n");
@@ -671,7 +782,7 @@ int Stack_Pop (struct stack_k* const Stack)
     Stack->Array[Stack->Size - 1 + 1] = 0;
     Stack->Size--;
 
-    if (Stack_Error (Stack) != Not_Error)
+    if (Stack_Error (Stack) != Not_Error_Stack)
     {
         Stack_Dump (Stack);
         printf ("Error in finish Stack_Pop\n\n");
@@ -683,7 +794,7 @@ int Stack_Pop (struct stack_k* const Stack)
 
 int Stack_Push (struct stack_k* const Stack, const int Element)
 {
-    if (Stack_Error (Stack) != Not_Error)
+    if (Stack_Error (Stack) != Not_Error_Stack)
     {
         Stack_Dump (Stack);
         printf ("Error in start Stack_Push\n\n");
@@ -698,7 +809,7 @@ int Stack_Push (struct stack_k* const Stack, const int Element)
     Stack->Array[Stack->Size + 1] = Element;
     Stack->Size++;
 
-    if (Stack_Error (Stack) != Not_Error)
+    if (Stack_Error (Stack) != Not_Error_Stack)
     {
         Stack_Dump (Stack);
         printf ("Error in finish Stack_Push\n\n");
@@ -837,6 +948,11 @@ int Check_Input (const char* const Str)
     {
         if ('9' < Str[i] || Str[i] < '0')
         {
+            if (i == 0 && Str[i] == '-')
+            {
+                continue;
+            }
+
             printf ("Incorrect input, enter only int number\n");
             return -1;
         }
