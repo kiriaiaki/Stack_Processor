@@ -30,7 +30,19 @@ int main ()
         return 0;
     }
 
-    printf ("Decompilation was successful!\n");
+    if (fseek (File_ASM, 0L, SEEK_SET) != 0)
+    {
+        printf ("!NOT FINISH DISASSEMBLER!\n Error moving in file for asm\n");
+        return 0;
+    }
+
+    if (Disassembly (Byte_Code, &Array_Labels, File_ASM) == There_Are_Errors)
+    {
+        printf ("!NOT FINISH DISASSEMBLER!");
+        return 0;
+    }
+
+    printf ("Decompilation was successful! (in file disassembler.asm)\n");
     fclose (File_ASM);
     Array_Labels_Dtor (&Array_Labels);
     return 0;
@@ -398,12 +410,12 @@ int Print_Label (FILE* const File_ASM, array_labels_k* const Array_Labels, const
             return There_Are_Errors;
         }
 
-        fprintf (File_ASM, "%s\n", Array_Labels->Ptr_Array_Labels[size_t (Comparison_Programme_Counter_Label (Array_Labels, Programme_Counter))].Name_Label);
+        fprintf (File_ASM, "%s\n\n", Array_Labels->Ptr_Array_Labels[size_t (Comparison_Programme_Counter_Label (Array_Labels, Programme_Counter))].Name_Label);
     }
 
     else
     {
-        fprintf (File_ASM, "%s\n", Array_Labels->Ptr_Array_Labels[Number_Label].Name_Label);
+        fprintf (File_ASM, "%s\n\n", Array_Labels->Ptr_Array_Labels[Number_Label].Name_Label);
     }
 
     return 0;
