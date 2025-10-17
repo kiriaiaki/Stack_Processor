@@ -194,6 +194,13 @@ int Check_Correct_Label (byte_code_k* const Byte_Code)
                     return There_Are_Errors;
                 }
                 break;
+            case CALL:
+                if (Byte_Code->Ptr_Byte_Code[i + 1] == -1)
+                {
+                    printf ("You have CALL with programme counter <%zu> on incorrect label\n", i);
+                    return There_Are_Errors;
+                }
+                break;
             default:
                 break;
         }
@@ -280,6 +287,14 @@ int Read_Task (const char* const Current_Line, const size_t Len_Current_Line)
     else if (strcmp (Str_With_Task, "JMP") == 0)
     {
         return JMP;
+    }
+    else if (strcmp (Str_With_Task, "CALL") == 0)
+    {
+        return CALL;
+    }
+    else if (strcmp (Str_With_Task, "RET") == 0)
+    {
+        return RET;
     }
     else if (strcmp (Str_With_Task, "SQRT") == 0)
     {
@@ -459,6 +474,17 @@ int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line
                 return There_Are_Errors;
             }
             break;
+        case CALL:
+            if (Str_With_Argument[0] == ':')
+            {
+                return Comparison_Name_Label (Array_Labels, &Str_With_Argument[1]);
+            }
+            else
+            {
+                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
+                return There_Are_Errors;
+            }
+            break;
         default:
             return 0;
             break;
@@ -525,6 +551,12 @@ int Append_Argument (byte_code_k* const Byte_Code, const int Value, const int Nu
             }
             break;
         case JMP:
+            if (Append_In_Byte_Code (Byte_Code, Array_Labels->Ptr_Array_Labels[Value].Programme_Counter) == There_Are_Errors)
+            {
+                return There_Are_Errors;
+            }
+            break;
+        case CALL:
             if (Append_In_Byte_Code (Byte_Code, Array_Labels->Ptr_Array_Labels[Value].Programme_Counter) == There_Are_Errors)
             {
                 return There_Are_Errors;

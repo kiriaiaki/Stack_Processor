@@ -21,6 +21,7 @@ struct processor_k
     size_t Programme_Counter;
     int* Array_Byte_Code;
     int Array_Register[Quantity_Registers];
+    stack_k Return_Stack;
 };
 
 enum Name_Error_Stack
@@ -39,7 +40,8 @@ enum Name_Error_Processor
     Error_Stack = 1,
     Error_Byte_Code = 2,
     Error_Programme_Counter = 3,
-    Error_Ver_Byte_Code = 4
+    Error_Ver_Byte_Code = 4,
+    Error_Return_Stack = 5
 };
 
 enum Work_Byte_Code
@@ -54,7 +56,9 @@ const int Canary = 29022008;
 const int There_Are_Errors = -2902;
 
 int Run (struct processor_k* const Processor);
+int Processor_Call (struct processor_k* const Processor, const size_t Location_Function);
 int Processor_Ctor (struct processor_k* const Processor);
+int Processor_Return (struct processor_k* const Processor);
 int Processor_Dump (const struct processor_k* const Processor);
 int Processor_Error (const struct processor_k* const Processor);
 int Processor_Dtor (struct processor_k* const Processor);
@@ -83,7 +87,6 @@ int Stack_Sqrt (struct stack_k* const Stack);
 int Stack_In (struct stack_k* const Stack);
 size_t Len_Byte_Code ();
 int* Receiving_Byte_Code ();
-int Quantity_Digit (int Number);
 int Verifier_Byte_Code (const struct processor_k* const Processor);
 int Check_Input (const char* const Str);
 

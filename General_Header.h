@@ -21,6 +21,8 @@ enum Name_Command
     SQRT = 16,
     LABEL = 17,
     IN = 18,
+    CALL = 19,
+    RET = 20,
     HLT = 0,
     Bad_Input = -1
 };
@@ -36,6 +38,6 @@ enum Name_Registers
 
 const char Name_File_Byte_Code[] = "Byte_Code.txt";
 
-const char Name_File_Assembler[] = "Square.asm";
+const char Name_File_Assembler[] = "Fibonacci.asm";
 
 #endif // GENERAL_HEADER_H

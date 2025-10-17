@@ -166,6 +166,21 @@ int Run (struct processor_k* const Processor)
                     return There_Are_Errors;
                 }
                 break;
+            case CALL:
+                Processor->Programme_Counter++;
+                Value = Processor->Array_Byte_Code[Processor->Programme_Counter];
+
+                if (Processor_Call (Processor, size_t (Value) ) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
+                break;
+            case RET:
+                if (Processor_Return (Processor) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
+                break;
             case HLT:
                 break;
             default:
@@ -191,6 +206,31 @@ int Run (struct processor_k* const Processor)
         // Processor_Dump (Processor);
         // getchar ();
     }
+
+    return 0;
+}
+
+int Processor_Call (struct processor_k* const Processor, const size_t Location_Function)
+{
+    if (Stack_Push (&Processor->Return_Stack, Processor->Programme_Counter + 1) == There_Are_Errors)
+    {
+        return There_Are_Errors;
+    }
+
+    Processor->Programme_Counter = Location_Function - 1;
+
+    return 0;
+}
+
+int Processor_Return (struct processor_k* const Processor)
+{
+    int Location_Return = Stack_Out (&Processor->Return_Stack);
+    if (Location_Return == There_Are_Errors)
+    {
+        return There_Are_Errors;
+    }
+
+    Stack_Jump (&Processor->Programme_Counter, Location_Return);
 
     return 0;
 }
@@ -240,6 +280,11 @@ int Processor_Error (const struct processor_k* const Processor)
         return Error_Ver_Byte_Code;
     }
 
+    if (Stack_Error (&Processor->Return_Stack) != Not_Error_Stack)
+    {
+        return Error_Return_Stack;
+    }
+
     return Not_Error_Processor;
 }
 
@@ -252,50 +297,117 @@ int Processor_Dtor (struct processor_k* const Processor)
     {
         Processor->Array_Register[i] = 0;
     }
+    Stack_Dtor(&Processor->Return_Stack);
     return 0;
 }
 
 int Processor_Dump (const struct processor_k* const Processor)
 {
     int Processor_Err = Processor_Error (Processor);
-    //TODO сделать выводы под случаи ошибок
-    printf ("\n----------------------------------------------------\n");
-    printf ("\nSTACK:\n");
 
+    printf ("\n+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+\n");
+
+    if (Processor_Err != Not_Error_Processor)
+    {
+        printf ("\n\033[31m!!!ERROR IN PROCESSOR!!!\033[0m\n");
+    }
+
+    printf ("\n\033[34mSTACK\033[0m:\n");
     Stack_Dump (&Processor->Stack);
 
-    printf ("\nPASSWORD: %d\n", Processor->Array_Byte_Code[0]);
-
-    printf ("\nVERSION: %c %d\n", Processor->Array_Byte_Code[1], Processor->Array_Byte_Code[2]);
-
-    printf ("\nBYTE CODE: ");
-    size_t Len = Len_Byte_Code ();
-    if (Len == 0)
+    if (Processor_Err != Error_Ver_Byte_Code)
     {
-        return There_Are_Errors;
+        printf ("\n\033[34mPASSWORD\033[0m: \033[32m%d\033[0m\n", Processor->Array_Byte_Code[0]);
+        printf ("\n\033[34mVERSION\033[0m: \033[32m%c %d\033[0m\n", Processor->Array_Byte_Code[1], Processor->Array_Byte_Code[2]);
+    }
+    else
+    {
+        printf ("\n\033[31mERROR VERIFICATION BYTE CODE\033[0m\n");
+        printf ("\nPASSWORD: \033[31m%d\033[0m\n", Processor->Array_Byte_Code[0]);
+        printf ("\nVERSION: \033[31m%c %d\033[0m\n", Processor->Array_Byte_Code[1], Processor->Array_Byte_Code[2]);
     }
 
-    for (size_t i = 3; i < Len; i++)
+    if (Processor_Err != Error_Byte_Code)
     {
-        //printf ("%4-Quantity_Digit(Processor->Array_Byte_Code[i])d", 0);
-        printf ("%d ", Processor->Array_Byte_Code[i]);
-    }
-    printf ("\n");
+        printf ("\n\033[34mBYTE CODE\033[0m: \n\n");
+        size_t Len = Len_Byte_Code ();
+        if (Len == 0)
+        {
+            return There_Are_Errors;
+        }
 
-    for (size_t i = 0; i < 11 + Processor->Programme_Counter * 4; i++)
+        size_t Len_Line = 20;
+        size_t k = 0;
+
+        for (size_t j = 0; j < Len_Line; j++)
+        {
+            printf ("+-----");
+        }
+        printf ("+\n");
+
+        if ((Len - 3) % Len_Line == 0)
+        {
+            k = Len;
+        }
+        else
+        {
+            k = Len + (Len_Line - (Len - 3) % Len_Line);
+        }
+
+        for (size_t i = 3; i < k; i++)
+        {
+            if (i == Processor->Programme_Counter)
+            {
+                printf ("|\033[0;44;1m %3d \033[0m", Processor->Array_Byte_Code[i]);
+            }
+
+            else if (i >= Len)
+            {
+                printf ("|     ");
+            }
+
+            else
+            {
+                printf ("| %3d ", Processor->Array_Byte_Code[i]);
+            }
+
+            if ((i - 3) % Len_Line == Len_Line - 1)
+            {
+                printf ("|\n");
+
+                for (size_t j = 0; j < Len_Line; j++)
+                {
+                    printf ("+-----");
+                }
+
+                printf ("+\n");
+            }
+        }
+    }
+    else
     {
-        printf (" ");
+        printf ("\n\033[31mERROR PTR BYTE CODE\033[0m\n");
+        printf ("\nArray with byte code [%p]\n", Processor->Array_Byte_Code);
     }
-    printf ("^^^^");
-    //TODO  сделать разделение вывода по строчкам цвет
 
-    printf ("\nPROGRAMME COUNTER: %zu\n", Processor->Programme_Counter);
+    if (Processor_Err != Error_Programme_Counter)
+    {
+        printf ("\n\033[34mPROGRAMME COUNTER\033[0m: %zu\n", Processor->Programme_Counter);
+    }
+    else
+    {
+        printf ("\n\033[31mERROR PROGRAMME COUNTER\033[0m\n");
+        printf ("\nPROGRAMME COUNTER: %zu\n", Processor->Programme_Counter);
+    }
 
-    printf ("\nARRAY REGISTER: AX = %d; BX = %d; CX = %d; DX = %d",
+    printf ("\n\033[34mARRAY REGISTER\033[0m: AX = %d; BX = %d; CX = %d; DX = %d\n",
             Processor->Array_Register[AX], Processor->Array_Register[BX],
             Processor->Array_Register[CX], Processor->Array_Register[DX]);
 
-    printf ("\n----------------------------------------------------\n");
+    printf ("\n\033[34mRETURN STACK\033[0m:\n");
+    Stack_Dump (&Processor->Return_Stack);
+
+    printf ("\n+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+\n");
 
     return 0;
 }
@@ -314,6 +426,11 @@ int Processor_Ctor (struct processor_k* const Processor)
     }
 
     Processor->Programme_Counter = 3;
+
+    if (Stack_Ctor (&Processor->Return_Stack, 3) == There_Are_Errors)
+    {
+        return There_Are_Errors;
+    }
 
     if (Processor_Error (Processor) != Not_Error_Processor)
     {
@@ -613,12 +730,12 @@ int Stack_Dump (const stack_k* const Stack)
 
     if (Stack_Err != 0)
     {
-        printf ("\n!!!EEERRROOORRR IN STACK!!!\n");
+        printf ("\n\033[31m!!!EEERRROOORRR IN STACK!!!\033[0m\n");
     }
 
     if (Stack_Err == Not_Struct_Stack)
     {
-        printf ("\nStruct with stack [%p] (not struct stack!)\n", Stack);
+        printf ("\nStruct with stack [%p] \033[31m(not struct stack!)\033[0m\n", Stack);
     }
 
     else
@@ -628,7 +745,7 @@ int Stack_Dump (const stack_k* const Stack)
 
         if (Stack_Err == Bad_Size)
         {
-            printf ("    Size = %zu (bad size!)\n", Stack->Size);
+            printf ("    Size = %zu \033[31m(bad size!)\033[0m\n", Stack->Size);
         }
 
         else
@@ -638,7 +755,7 @@ int Stack_Dump (const stack_k* const Stack)
 
         if (Stack_Err == Capacity_Null)
         {
-            printf ("    Capacity = %zu (bad capacity!)\n", Stack->Capacity);
+            printf ("    Capacity = %zu \033[31m(bad capacity!)\033[0m\n", Stack->Capacity);
         }
 
         else
@@ -648,7 +765,7 @@ int Stack_Dump (const stack_k* const Stack)
 
         if (Stack_Err == Not_Array_Stack)
         {
-            printf ("    Stack [%p] (not array stack!)\n", Stack->Array);
+            printf ("    Stack [%p] \033[31m(not array stack!)\033[0m\n", Stack->Array);
         }
 
         else
@@ -658,12 +775,12 @@ int Stack_Dump (const stack_k* const Stack)
 
             if (Stack->Array[0] != Canary)
             {
-                printf ("       -[Start_Canary] = %d (bad canary!)\n", Stack->Array[0]);
+                printf ("       -[Start_Canary] = %d \033[31m(bad canary!)\033[0m\n", Stack->Array[0]);
             }
 
             else
             {
-                printf ("       +[Start_Canary] = %d\n", Stack->Array[0]);
+                printf ("       +[\033[32mStart_Canary\033[0m] = %d\n", Stack->Array[0]);
             }
 
             if (Stack_Err == Bad_Size)
@@ -683,19 +800,19 @@ int Stack_Dump (const stack_k* const Stack)
 
                 for (size_t i = Stack->Size; i < Stack->Capacity - 2; i++)
                 {
-                    printf ("        [%zu] = %d (poison)\n", i, Stack->Array[i + 1]);
+                    printf ("        [%zu] = %d \033[31m(poison)\033[0m\n", i, Stack->Array[i + 1]);
                 }
             }
 
             if (Stack->Array[Stack->Capacity - 1] != Canary)
             {
-                printf ("       -[Finish_Canary] = %d (bad canary!)\n"
+                printf ("       -[Finish_Canary] = %d \033[31m(bad canary!)\033[0m\n"
                         "    }\n", Stack->Array[Stack->Capacity - 1]);
             }
 
             else
             {
-                printf ("       +[Finish_Canary] = %d\n"
+                printf ("       +[\033[32mFinish_Canary\033[0m] = %d\n"
                         "    }\n", Stack->Array[Stack->Capacity - 1]);
             }
         }
@@ -886,25 +1003,6 @@ int* Receiving_Byte_Code ()
     fclose (File);
 
     return Byte_Code;
-}
-
-int Quantity_Digit (int Number)
-{
-    int Quantity = 0;
-
-    if (Number <= 0)
-    {
-        Number = Number * (-1);
-        Quantity++;
-    }
-
-    while (Number != 0)
-    {
-        Number /= 10;
-        Quantity++;
-    }
-
-    return Quantity;
 }
 
 int Verifier_Byte_Code (const struct processor_k* const Processor)

@@ -26,7 +26,7 @@ int main ()
 
     if (Disassembly (Byte_Code, &Array_Labels, File_ASM) == There_Are_Errors)
     {
-        printf ("!NOT FINISH DISASSEMBLER!");
+        printf ("!NOT FINISH DISASSEMBLER!\n");
         return 0;
     }
 
@@ -38,7 +38,7 @@ int main ()
 
     if (Disassembly (Byte_Code, &Array_Labels, File_ASM) == There_Are_Errors)
     {
-        printf ("!NOT FINISH DISASSEMBLER!");
+        printf ("!NOT FINISH DISASSEMBLER!\n");
         return 0;
     }
 
@@ -158,6 +158,17 @@ int Disassembly (const int* const Byte_Code, array_labels_k* const Array_Labels,
                 break;
             case IN:
                 fprintf (File_ASM, "IN\n");
+                break;
+            case CALL:
+                i++;
+                fprintf (File_ASM, "CALL :");
+                if (Print_Label (File_ASM, Array_Labels, Byte_Code[i]) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
+                break;
+            case RET:
+                fprintf (File_ASM, "\nRET\n");
                 break;
             case HLT:
                 fprintf (File_ASM, "HLT\n");
