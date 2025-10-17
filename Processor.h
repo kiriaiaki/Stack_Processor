@@ -22,6 +22,7 @@ struct processor_k
     int* Array_Byte_Code;
     int Array_Register[Quantity_Registers];
     stack_k Return_Stack;
+    int* Random_Access_Memory;
 };
 
 enum Name_Error_Stack
@@ -55,9 +56,16 @@ const int Canary = 29022008;
 
 const int There_Are_Errors = -2902;
 
+const size_t Size_Ram = 1296;
+
 int Run (struct processor_k* const Processor);
 int Processor_Call (struct processor_k* const Processor, const size_t Location_Function);
 int Processor_Ctor (struct processor_k* const Processor);
+int* Create_Ram ();
+int Ram_Draw (struct processor_k* const Processor);
+int Delete_Ram (int* Random_Access_Memory);
+int Push_Memory (struct processor_k* const Processor);
+int Pop_Memory (struct processor_k* const Processor);
 int Processor_Return (struct processor_k* const Processor);
 int Processor_Dump (const struct processor_k* const Processor);
 int Processor_Error (const struct processor_k* const Processor);

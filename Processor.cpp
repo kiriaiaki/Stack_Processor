@@ -6,17 +6,18 @@ int main ()
     if (Processor_Ctor (&Processor) == There_Are_Errors)
     {
         Processor_Dump (&Processor);
-        printf ("!NOT START PROCESSOR!\n");
+        printf ("\033[31m!NOT START PROCESSOR!\033[0m\n");
         return 0;
     }
 
     if (Run (&Processor) == There_Are_Errors)
     {
         Processor_Dump (&Processor);
-        printf ("!NOT FINISH PROCESSOR!\n");
+        printf ("\033[31m!NOT FINISH PROCESSOR!\033[0m\n");
         return 0;
     }
 
+    printf ("\n\033[32mProcessor worked successful!\033[0m\n");
     Processor_Dtor (&Processor);
     return 0;
 }
@@ -90,6 +91,21 @@ int Run (struct processor_k* const Processor)
                 {
                     return There_Are_Errors;
                 }
+                break;
+            case PUSHMEM:
+                if (Push_Memory (Processor) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
+                break;
+            case POPMEM:
+                if (Pop_Memory (Processor) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
+                break;
+            case DRAW:
+                Ram_Draw (Processor);
                 break;
             case JB:
                 Processor->Programme_Counter++;
@@ -204,9 +220,26 @@ int Run (struct processor_k* const Processor)
         }
 
         // Processor_Dump (Processor);
+        // Ram_Dump (Processor->Random_Access_Memory);
         // getchar ();
     }
 
+    return 0;
+}
+
+int Ram_Draw (struct processor_k* const Processor)
+{
+    printf("\033[H\033[2J");
+
+    for (size_t i = 0; i < Size_Ram; i++)
+    {
+        printf ("%c ", Processor->Random_Access_Memory[i]);
+
+        if (i % 48 == 47)
+        {
+            printf ("\n");
+        }
+    }
     return 0;
 }
 
@@ -298,6 +331,7 @@ int Processor_Dtor (struct processor_k* const Processor)
         Processor->Array_Register[i] = 0;
     }
     Stack_Dtor(&Processor->Return_Stack);
+    Delete_Ram (Processor->Random_Access_Memory);
     return 0;
 }
 
@@ -437,6 +471,62 @@ int Processor_Ctor (struct processor_k* const Processor)
         Processor_Dump (Processor);
         return There_Are_Errors;
     }
+
+    Processor->Random_Access_Memory = Create_Ram ();
+    if (Processor->Random_Access_Memory == NULL)
+    {
+        return There_Are_Errors;
+    }
+
+    return 0;
+}
+
+int* Create_Ram ()
+{
+    int* Random_Access_Memory = (int*) calloc (Size_Ram, sizeof (int));
+
+    if (Random_Access_Memory == NULL)
+    {
+        printf ("Error allocation memory for ram\n");
+        return NULL;
+    }
+
+    return Random_Access_Memory;
+}
+
+int Delete_Ram (int* Random_Access_Memory)
+{
+    free (Random_Access_Memory);
+    return 0;
+}
+
+int Push_Memory (struct processor_k* const Processor)
+{
+    Processor->Programme_Counter++;
+    int Number_Register = Processor->Array_Byte_Code[Processor->Programme_Counter];
+    int Value_Register = Processor->Array_Register[Number_Register];
+    int Value = Processor->Random_Access_Memory[Value_Register];
+
+    if (Stack_Push (&Processor->Stack, Processor->Random_Access_Memory[Value_Register]) == There_Are_Errors)
+    {
+        return There_Are_Errors;
+    }
+
+    return 0;
+}
+
+int Pop_Memory (struct processor_k* const Processor)
+{
+    int Value = Stack_Out (&Processor->Stack);
+    if (Value == There_Are_Errors)
+    {
+        return There_Are_Errors;
+    }
+
+    Processor->Programme_Counter++;
+    int Number_Register = Processor->Array_Byte_Code[Processor->Programme_Counter];
+    int Value_Register = Processor->Array_Register[Number_Register];
+    Processor->Random_Access_Memory[Value_Register] = Value;
 
     return 0;
 }

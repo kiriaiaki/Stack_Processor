@@ -23,6 +23,9 @@ enum Name_Command
     IN = 18,
     CALL = 19,
     RET = 20,
+    PUSHMEM = 21,
+    POPMEM = 22,
+    DRAW = 23,
     HLT = 0,
     Bad_Input = -1
 };
@@ -38,6 +41,6 @@ enum Name_Registers
 
 const char Name_File_Byte_Code[] = "Byte_Code.txt";
 
-const char Name_File_Assembler[] = "Fibonacci.asm";
+const char Name_File_Assembler[] = "Circle.asm";
 
 #endif // GENERAL_HEADER_H

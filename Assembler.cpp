@@ -2,16 +2,19 @@
 
 int main ()
 {
+    printf ("\033[34mWork with file: %s\033[0m\n", Name_File_Assembler);
+
     char* Buffer = Open_File_And_Copying_In_Buffer ();
     if (Buffer == NULL)
     {
+        printf ("\033[31m!NOT START ASSEMBLER!\033[0m \nError allocating memory for buffer\n");
         return 0;
     }
 
     struct byte_code_k Byte_Code = {};
     if (Byte_Code.Ptr_Byte_Code == NULL)
     {
-        printf ("!NOT START ASSEMBLER! Error allocating memory for byte code\n");
+        printf ("\033[31m!NOT START ASSEMBLER!\033[0m \nError allocating memory for byte code\n");
         return 0;
     }
     Byte_Code.Ptr_Byte_Code[0] = Password;
@@ -21,7 +24,7 @@ int main ()
     struct array_labels_k Array_Labels = {};
     if (Array_Labels.Ptr_Array_Labels == NULL)
     {
-        printf ("!NOT START ASSEMBLER! Error allocating memory for array labels\n");
+        printf ("\033[31m!NOT START ASSEMBLER!\033[0m\n Error allocating memory for array labels\n");
         return 0;
     }
     Array_Labels.Ptr_Array_Labels[0].Name_Label = (char*) calloc (10, sizeof (char));
@@ -31,36 +34,36 @@ int main ()
 
     if (Assembly (&Array_Labels, &Byte_Code, Buffer) == There_Are_Errors)
     {
-        printf ("!ASSEMBLER NOT FINISH!\n");
+        printf ("\033[31m!ASSEMBLER NOT FINISH!\033[0m\n");
         return 0;
     }
     Byte_Code.Counter_Byte_Code = 3;
     if (Assembly (&Array_Labels, &Byte_Code, Buffer) == There_Are_Errors)
     {
-        printf ("!ASSEMBLER NOT FINISH!\n");
+        printf ("\033[31m!ASSEMBLER NOT FINISH!\033[0m\n");
         return 0;
     }
 
     if (Check_Correct_Label (&Byte_Code) == There_Are_Errors)
     {
-        printf ("!ASSEMBLER NOT FINISH!\n");
+        printf ("\033[31m!ASSEMBLER NOT FINISH!\033[0m\n");
         return 0;
     }
     FILE* File_Byte_Code = fopen (Name_File_Byte_Code, "w");
     if (File_Byte_Code == NULL)
     {
-        printf ("!ASSEMBLER NOT FINISH!\n Error opening file for byte code\n");
+        printf ("\033[31m!ASSEMBLER NOT FINISH!\033[0m\n Error opening file for byte code\n");
         return 0;
 
     }
     if (fwrite (Byte_Code.Ptr_Byte_Code, sizeof (int), Byte_Code.Counter_Byte_Code, File_Byte_Code) < Byte_Code.Counter_Byte_Code)
     {
-        printf ("!ASSEMBLER NOT FINISH!\n Error writing in file for byte code\n");
+        printf ("\033[31m!ASSEMBLER NOT FINISH!\033[0m\n Error writing in file for byte code\n");
         return 0;
     }
     fclose (File_Byte_Code);
 
-    printf ("Compilation was successful!\n");
+    printf ("\033[32mCompilation was successful!\033[0m\n");
     free (Buffer);
     free (Byte_Code.Ptr_Byte_Code);
     Array_Labels_Dtor (&Array_Labels);
@@ -292,6 +295,10 @@ int Read_Task (const char* const Current_Line, const size_t Len_Current_Line)
     {
         return CALL;
     }
+    else if (strcmp (Str_With_Task, "DRAW") == 0)
+    {
+        return DRAW;
+    }
     else if (strcmp (Str_With_Task, "RET") == 0)
     {
         return RET;
@@ -303,6 +310,14 @@ int Read_Task (const char* const Current_Line, const size_t Len_Current_Line)
     else if (strcmp (Str_With_Task, "IN") == 0)
     {
        return IN;
+    }
+    else if (strcmp (Str_With_Task, "PUSHMEM") == 0)
+    {
+       return PUSHMEM;
+    }
+    else if (strcmp (Str_With_Task, "POPMEM") == 0)
+    {
+       return POPMEM;
     }
     else
     {
@@ -388,6 +403,52 @@ int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line
                 return CX;
             }
             else if (strcmp (Str_With_Argument, "DX") == 0)
+            {
+                return DX;
+            }
+            else
+            {
+                printf ("<%s> \n This string incorrect, this register doesn't exist\n", Current_Line);
+                return There_Are_Errors;
+            }
+            break;
+        case PUSHMEM:
+            if (strcmp (Str_With_Argument, "[AX]") == 0)
+            {
+                return AX;
+            }
+            else if (strcmp (Str_With_Argument, "[BX]") == 0)
+            {
+                return BX;
+            }
+            else if (strcmp (Str_With_Argument, "[CX]") == 0)
+            {
+                return CX;
+            }
+            else if (strcmp (Str_With_Argument, "[DX]") == 0)
+            {
+                return DX;
+            }
+            else
+            {
+                printf ("<%s> \n This string incorrect, this register doesn't exist\n", Current_Line);
+                return There_Are_Errors;
+            }
+            break;
+        case POPMEM:
+            if (strcmp (Str_With_Argument, "[AX]") == 0)
+            {
+                return AX;
+            }
+            else if (strcmp (Str_With_Argument, "[BX]") == 0)
+            {
+                return BX;
+            }
+            else if (strcmp (Str_With_Argument, "[CX]") == 0)
+            {
+                return CX;
+            }
+            else if (strcmp (Str_With_Argument, "[DX]") == 0)
             {
                 return DX;
             }
@@ -508,6 +569,18 @@ int Append_Argument (byte_code_k* const Byte_Code, const int Value, const int Nu
                 return There_Are_Errors;
             }
             break;
+        case PUSHMEM:
+            if (Append_In_Byte_Code (Byte_Code, Value) == There_Are_Errors)
+            {
+                return There_Are_Errors;
+            }
+            break;
+        case POPMEM:
+            if (Append_In_Byte_Code (Byte_Code, Value) == There_Are_Errors)
+            {
+                return There_Are_Errors;
+            }
+            break;
         case POPREG:
             if (Append_In_Byte_Code (Byte_Code, Value) == There_Are_Errors)
             {
@@ -565,6 +638,7 @@ int Append_Argument (byte_code_k* const Byte_Code, const int Value, const int Nu
         default:
             break;
     }
+
     return 0;
 }
 

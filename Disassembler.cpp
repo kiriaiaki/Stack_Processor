@@ -5,19 +5,19 @@ int main ()
     int* Byte_Code = Receiving_Byte_Code ();
     if (Byte_Code == NULL)
     {
-        printf ("!NOT START DISASSEMBLER!\n");
+        printf ("\n\033[31m!NOT START DISASSEMBLER!\n\033[0m\n");
         return 0;
     }
     if (Verifier_Byte_Code (Byte_Code) == There_Are_Errors)
     {
-        printf ("!NOT START DISASSEMBLER!\n");
+        printf ("\n\033[31m!NOT START DISASSEMBLER!\n\033[0m\n");
         return 0;
     }
 
     FILE* File_ASM = fopen ("disassembler.asm", "w");
     if (File_ASM == NULL)
     {
-        printf ("!NOT START DISASSEMBLER!\n Error opening file for asm\n");
+        printf ("\n\033[31m!NOT START DISASSEMBLER\n\033[0m!\n Error opening file for asm\n");
         return 0;
 
     }
@@ -26,23 +26,23 @@ int main ()
 
     if (Disassembly (Byte_Code, &Array_Labels, File_ASM) == There_Are_Errors)
     {
-        printf ("!NOT FINISH DISASSEMBLER!\n");
+        printf ("\n\033[31m!NOT FINISH DISASSEMBLER!\n\033[0m\n");
         return 0;
     }
 
     if (fseek (File_ASM, 0L, SEEK_SET) != 0)
     {
-        printf ("!NOT FINISH DISASSEMBLER!\n Error moving in file for asm\n");
+        printf ("\n\033[31m!NOT FINISH DISASSEMBLER!\n\033[0m\n Error moving in file for asm\n");
         return 0;
     }
 
     if (Disassembly (Byte_Code, &Array_Labels, File_ASM) == There_Are_Errors)
     {
-        printf ("!NOT FINISH DISASSEMBLER!\n");
+        printf ("\033[31m!NOT FINISH DISASSEMBLER!\033[0m\n");
         return 0;
     }
 
-    printf ("Decompilation was successful! (in file disassembler.asm)\n");
+    printf ("\033[32mDecompilation was successful!\033[0m (in file disassembler.asm)\n");
     fclose (File_ASM);
     Array_Labels_Dtor (&Array_Labels);
     return 0;
@@ -174,6 +174,7 @@ int Disassembly (const int* const Byte_Code, array_labels_k* const Array_Labels,
                 fprintf (File_ASM, "HLT\n");
                 break;
             default:
+                printf ("Command with number <%d> does not exist\n", Byte_Code[i]);
                 return There_Are_Errors;
         }
 
@@ -273,6 +274,7 @@ int Compare_Registers (const int Number_Register, FILE* const File_ASM)
             fprintf (File_ASM, "DX\n");
             break;
         default:
+            printf ("Register with number <%d> does not exist\n", Number_Register);
             return There_Are_Errors;
     }
 
