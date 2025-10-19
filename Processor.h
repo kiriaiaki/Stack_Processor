@@ -6,6 +6,9 @@
 #include <assert.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <iostream>
+#include <cstdlib>
+#include <unistd.h>
 #include "General_Header.h"
 
 struct stack_k
@@ -56,17 +59,19 @@ const int Canary = 29022008;
 
 const int There_Are_Errors = -2902;
 
-const size_t Size_Ram = 1296;
+const size_t Size_Ram = 7200;
 
 int Run (struct processor_k* const Processor);
-int Processor_Call (struct processor_k* const Processor, const size_t Location_Function);
+int Processor_Call (struct processor_k* const Processor, const int Number_Command);
 int Processor_Ctor (struct processor_k* const Processor);
 int* Create_Ram ();
-int Ram_Draw (struct processor_k* const Processor);
+int Ram_Draw (struct processor_k* const Processor, const int Number_Command);
 int Delete_Ram (int* Random_Access_Memory);
-int Push_Memory (struct processor_k* const Processor);
-int Pop_Memory (struct processor_k* const Processor);
-int Processor_Return (struct processor_k* const Processor);
+int Stack_Conditional_Jump (struct processor_k* const Processor, const int Number_Command);
+int Stack_Pushs (struct processor_k* const Processor, const int Number_Command);
+int Stack_Math (struct processor_k* const Processor, const int Number_Command);
+int Pop_Memory (struct processor_k* const Processor, const int Number_Command);
+int Processor_Return (struct processor_k* const Processor, const int Number_Command);
 int Processor_Dump (const struct processor_k* const Processor);
 int Processor_Error (const struct processor_k* const Processor);
 int Processor_Dtor (struct processor_k* const Processor);
@@ -75,27 +80,51 @@ int Stack_Dump (const stack_k* const Stack);
 int Stack_Error (const struct stack_k* const Stack);
 int Stack_Dtor (struct stack_k* const Stack);
 int Stack_Check_Reserve (struct stack_k* const Stack);
-int Stack_Push (struct stack_k* const Stack, const int Element);
 int Stack_Pop (struct stack_k* const Stack);
-int Stack_Add (struct stack_k* const Stack);
-int Stack_Sub (struct stack_k* const Stack);
-int Stack_Mul (struct stack_k* const Stack);
-int Stack_Div (struct stack_k* const Stack);
-int Stack_Out (struct stack_k* const Stack);
-int Stack_Push_Reg (struct stack_k* const Stack, int* const Array_Register, const size_t Number_Register);
-int Stack_Pop_Reg (struct stack_k* const Stack, int* const Array_Register, const size_t Number_Register);
-int Stack_Jump_Below (struct stack_k* const Stack, size_t* const Programme_Counter , const size_t Location_Jump);
-int Stack_Jump_Below_Equal (struct stack_k* const Stack, size_t* const Programme_Counter , const size_t Location_Jump);
-int Stack_Jump_Above (struct stack_k* const Stack, size_t* const Programme_Counter , const size_t Location_Jump);
-int Stack_Jump_Above_Equal (struct stack_k* const Stack, size_t* const Programme_Counter , const size_t Location_Jump);
-int Stack_Jump_Equal (struct stack_k* const Stack, size_t* const Programme_Counter , const size_t Location_Jump);
-int Stack_Jump_Not_Equal (struct stack_k* const Stack, size_t* const Programme_Counter , const size_t Location_Jump);
-int Stack_Jump (size_t* const Programme_Counter , const size_t Location_Jump);
-int Stack_Sqrt (struct stack_k* const Stack);
-int Stack_In (struct stack_k* const Stack);
+int Stack_Out (struct processor_k* const Processor, const int Number_Command);
+int Stack_Pop_Reg (struct processor_k* const Processor, const int Number_Command);
+int Stack_Jump (struct processor_k* const Processor, const int Number_Command);
+int Stack_Sqrt (struct processor_k* const Processor, const int Number_Command);
+int Stack_In (struct processor_k* const Processor, const int Number_Command);
+int Push_In_Stack (struct stack_k* const Stack, const int Element);
 size_t Len_Byte_Code ();
 int* Receiving_Byte_Code ();
 int Verifier_Byte_Code (const struct processor_k* const Processor);
 int Check_Input (const char* const Str);
+int Jump (size_t* const Programme_Counter , const size_t Location_Jump);
+int Out_From_Stack (struct stack_k* const Stack);
+
+struct command_k
+{
+    int Argument;
+    int (*Fun) (struct processor_k* const Processor, const int Number_Command);
+};
+
+const command_k Array_Command[Quantity_Commands] = {
+{0,  NULL},
+{1,  Stack_Pushs},
+{1,  Stack_Math},
+{1,  Stack_Math},
+{1,  Stack_Math},
+{1,  Stack_Math},
+{1,  Stack_Out},
+{1,  Stack_Pushs},
+{1,  Stack_Pop_Reg},
+{1,  Stack_Conditional_Jump},
+{1,  Stack_Conditional_Jump},
+{1,  Stack_Conditional_Jump},
+{1,  Stack_Conditional_Jump},
+{1,  Stack_Conditional_Jump},
+{1,  Stack_Conditional_Jump},
+{1,  Stack_Jump},
+{1,  Stack_Sqrt},
+{0,  NULL},
+{1,  Stack_In},
+{1,  Processor_Call},
+{1,  Processor_Return},
+{1,  Stack_Pushs},
+{1,  Pop_Memory},
+{1,  Ram_Draw}
+};
 
 #endif // PROCESSOR_H

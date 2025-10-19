@@ -86,51 +86,9 @@ int Assembly (array_labels_k* const Array_Labels, byte_code_k* const Byte_Code, 
             size_t Len_Current_Line = size_t (&Buffer[i] - Ptr_Last_Slash_N) + 1;
             Ptr_Last_Slash_N = &Buffer[i + 1];
 
-            int Number_Command = Read_Task (Current_Line, Len_Current_Line);
-            if (Number_Command == There_Are_Errors)
+            if (Read_Task (Current_Line, Len_Current_Line, Byte_Code, Array_Labels) == There_Are_Errors)
             {
                 return There_Are_Errors;
-            }
-
-            switch (Number_Command)
-            {
-                case Bad_Input:
-                    for (size_t k = 0; k < Len_Current_Line - 1; k++)
-                    {
-                        if (Current_Line[k] != ' ')
-                        {
-                            printf ("<%s> This string incorrect\n"
-                                    "now programme counter = %zu\n", Current_Line, Byte_Code->Counter_Byte_Code);
-                            return There_Are_Errors;
-                        }
-                    }
-                    break;
-
-                case LABEL:
-                    Number_Label = Read_Label (Current_Line, Len_Current_Line, Array_Labels);
-                    if (Number_Label == There_Are_Errors)
-                    {
-                        return There_Are_Errors;
-                    }
-                    Array_Labels->Ptr_Array_Labels[Number_Label].Programme_Counter = int (Byte_Code->Counter_Byte_Code);
-                    break;
-
-                default:
-                    if (Append_In_Byte_Code (Byte_Code, Number_Command) == There_Are_Errors)
-                    {
-                        return There_Are_Errors;
-                    }
-
-                    int Argument = Read_Argument (Current_Line, Len_Current_Line, Number_Command, Array_Labels);
-                    if (Argument == There_Are_Errors)
-                    {
-                        return There_Are_Errors;
-                    }
-
-                    if (Append_Argument (Byte_Code, Argument, Number_Command, Array_Labels) == There_Are_Errors)
-                    {
-                        return There_Are_Errors;
-                    }
             }
 
             Buffer[i] = '\n';
@@ -212,7 +170,7 @@ int Check_Correct_Label (byte_code_k* const Byte_Code)
     return 0;
 }
 
-int Read_Task (const char* const Current_Line, const size_t Len_Current_Line)
+int Read_Task (const char* const Current_Line, const size_t Len_Current_Line, byte_code_k* const Byte_Code, array_labels_k* const Array_Labels)
 {
     char* Str_With_Task = (char*) calloc (Len_Current_Line, sizeof (char));
     if (Str_With_Task == NULL)
@@ -224,109 +182,61 @@ int Read_Task (const char* const Current_Line, const size_t Len_Current_Line)
 
     if (Str_With_Task[0] == ':')
     {
-        return LABEL;
+        int Number_Label = (*Array_Command[LABEL].Read_Argument) (Current_Line, Len_Current_Line, Array_Labels);
+        if (Number_Label == There_Are_Errors)
+        {
+            return There_Are_Errors;
+        }
+        Array_Labels->Ptr_Array_Labels[Number_Label].Programme_Counter = int (Byte_Code->Counter_Byte_Code);
+        return 0;
     }
 
-    if (strcmp (Str_With_Task, "PUSH") == 0)
+    for (size_t Number_Command = 0; Number_Command < Quantity_Commands; Number_Command++)
     {
-       return PUSH;
+        if (strcmp (Array_Command[Number_Command].Name_Command, Str_With_Task) == 0)
+        {
+            if (Append_In_Byte_Code (Byte_Code, Number_Command) == There_Are_Errors)
+            {
+                return There_Are_Errors;
+            }
+
+            if (Array_Command[Number_Command].Append_Argument == 1)
+            {
+                int Value = (*Array_Command[Number_Command].Read_Argument) (Current_Line, Len_Current_Line, Array_Labels);
+
+                if (Value == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
+
+                if (Append_In_Byte_Code (Byte_Code, Value) == There_Are_Errors)
+                {
+                    return There_Are_Errors;
+                }
+
+            }
+
+            free (Str_With_Task);
+            return 0;
+        }
     }
-    else if (strcmp (Str_With_Task, "ADD") == 0)
+
+    for (size_t k = 0; k < Len_Current_Line - 1; k++)
     {
-       return ADD;
+        if (Current_Line[k] != ' ')
+        {
+            printf ("<%s> This string incorrect\n"
+                    "now programme counter = %zu\n", Current_Line, Byte_Code->Counter_Byte_Code);
+            free (Str_With_Task);
+            return There_Are_Errors;
+        }
     }
-    else if (strcmp (Str_With_Task, "SUB") == 0)
-    {
-       return SUB;
-    }
-    else if (strcmp (Str_With_Task, "MUL") == 0)
-    {
-        return MUL;
-    }
-    else if (strcmp (Str_With_Task, "DIV") == 0)
-    {
-       return DIV;
-    }
-    else if (strcmp (Str_With_Task, "OUT") == 0)
-    {
-       return OUT;
-    }
-    else if (strcmp (Str_With_Task, "HLT") == 0)
-    {
-       return HLT;
-    }
-    else if (strcmp (Str_With_Task, "PUSHREG") == 0)
-    {
-       return PUSHREG;
-    }
-    else if (strcmp (Str_With_Task, "POPREG") == 0)
-    {
-        return POPREG;
-    }
-    else if (strcmp (Str_With_Task, "JB") == 0)
-    {
-        return JB;
-    }
-    else if (strcmp (Str_With_Task, "JBE") == 0)
-    {
-        return JBE;
-    }
-    else if (strcmp (Str_With_Task, "JA") == 0)
-    {
-        return JA;
-    }
-    else if (strcmp (Str_With_Task, "JAE") == 0)
-    {
-        return JAE;
-    }
-    else if (strcmp (Str_With_Task, "JE") == 0)
-    {
-        return JE;
-    }
-    else if (strcmp (Str_With_Task, "JNE") == 0)
-    {
-        return JNE;
-    }
-    else if (strcmp (Str_With_Task, "JMP") == 0)
-    {
-        return JMP;
-    }
-    else if (strcmp (Str_With_Task, "CALL") == 0)
-    {
-        return CALL;
-    }
-    else if (strcmp (Str_With_Task, "DRAW") == 0)
-    {
-        return DRAW;
-    }
-    else if (strcmp (Str_With_Task, "RET") == 0)
-    {
-        return RET;
-    }
-    else if (strcmp (Str_With_Task, "SQRT") == 0)
-    {
-       return SQRT;
-    }
-    else if (strcmp (Str_With_Task, "IN") == 0)
-    {
-       return IN;
-    }
-    else if (strcmp (Str_With_Task, "PUSHMEM") == 0)
-    {
-       return PUSHMEM;
-    }
-    else if (strcmp (Str_With_Task, "POPMEM") == 0)
-    {
-       return POPMEM;
-    }
-    else
-    {
-        return Bad_Input;
-    }
-    //TODO FREEE ?!?!?!??!
+
+    free (Str_With_Task);
+    return 0;
 }
 
-int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line, const int Number_Command, array_labels_k* const Array_Labels)
+int Read_Number (const char* const Current_Line, const size_t Len_Current_Line, array_labels_k* const Array_Labels)
 {
     char* Str_With_Task = (char*) calloc (Len_Current_Line, sizeof (char));
     if (Str_With_Task == NULL)
@@ -334,315 +244,117 @@ int Read_Argument (const char* const Current_Line, const size_t Len_Current_Line
         printf ("!ERROR IN ASSEMBLER! Error allocation memory for string with task\n");
         return There_Are_Errors;
     }
-    char* Str_With_Argument = (char*) calloc (Len_Current_Line, sizeof (char));
-    if (Str_With_Argument == NULL)
+    char* Str_With_Number = (char*) calloc (Len_Current_Line, sizeof (char));
+    if (Str_With_Number == NULL)
     {
         printf ("!ERROR IN ASSEMBLER! Error allocation memory for string with arguments\n");
         return There_Are_Errors;
     }
 
-    sscanf (Current_Line, "%s %s", Str_With_Task, Str_With_Argument);
-    switch (Number_Command)
+    sscanf (Current_Line, "%s %s", Str_With_Task, Str_With_Number);
+
+    for (size_t i = 0; i < Len_Current_Line; i++)
     {
-        case PUSH:
-            for (size_t i = 0; i < Len_Current_Line; i++)
-            {
-                if (Str_With_Argument[i] == '\0')
-                {
-                    break;
-                }
-                if ('0' > Str_With_Argument[i] || Str_With_Argument[i] > '9')
-                {
-                    if (i == 0 && Str_With_Argument[i] == '-')
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        printf ("<%s> \nThis string incorrect, argument push not a number\n", Current_Line);
-                        return There_Are_Errors;
-                    }
-                }
-            }
-            return atoi (Str_With_Argument);
+        if (Str_With_Number[i] == '\0')
+        {
             break;
-        case PUSHREG:
-            if (strcmp (Str_With_Argument, "AX") == 0)
+        }
+
+        if ('0' > Str_With_Number[i] || Str_With_Number[i] > '9')
+        {
+            if (i == 0 && Str_With_Number[i] == '-')
             {
-                return AX;
+                continue;
             }
-            else if (strcmp (Str_With_Argument, "BX") == 0)
-            {
-                return BX;
-            }
-            else if (strcmp (Str_With_Argument, "CX") == 0)
-            {
-                return CX;
-            }
-            else if (strcmp (Str_With_Argument, "DX") == 0)
-            {
-                return DX;
-            }
+
             else
             {
-                printf ("<%s> \n This string incorrect, this register doesn't exist\n", Current_Line);
+                printf ("<%s> \nThis string incorrect, argument push not a number\n", Current_Line);
+                free (Str_With_Task);
+                free (Str_With_Number);
                 return There_Are_Errors;
             }
-            break;
-        case POPREG:
-            if (strcmp (Str_With_Argument, "AX") == 0)
-            {
-                return AX;
-            }
-            else if (strcmp (Str_With_Argument, "BX") == 0)
-            {
-                return BX;
-            }
-            else if (strcmp (Str_With_Argument, "CX") == 0)
-            {
-                return CX;
-            }
-            else if (strcmp (Str_With_Argument, "DX") == 0)
-            {
-                return DX;
-            }
-            else
-            {
-                printf ("<%s> \n This string incorrect, this register doesn't exist\n", Current_Line);
-                return There_Are_Errors;
-            }
-            break;
-        case PUSHMEM:
-            if (strcmp (Str_With_Argument, "[AX]") == 0)
-            {
-                return AX;
-            }
-            else if (strcmp (Str_With_Argument, "[BX]") == 0)
-            {
-                return BX;
-            }
-            else if (strcmp (Str_With_Argument, "[CX]") == 0)
-            {
-                return CX;
-            }
-            else if (strcmp (Str_With_Argument, "[DX]") == 0)
-            {
-                return DX;
-            }
-            else
-            {
-                printf ("<%s> \n This string incorrect, this register doesn't exist\n", Current_Line);
-                return There_Are_Errors;
-            }
-            break;
-        case POPMEM:
-            if (strcmp (Str_With_Argument, "[AX]") == 0)
-            {
-                return AX;
-            }
-            else if (strcmp (Str_With_Argument, "[BX]") == 0)
-            {
-                return BX;
-            }
-            else if (strcmp (Str_With_Argument, "[CX]") == 0)
-            {
-                return CX;
-            }
-            else if (strcmp (Str_With_Argument, "[DX]") == 0)
-            {
-                return DX;
-            }
-            else
-            {
-                printf ("<%s> \n This string incorrect, this register doesn't exist\n", Current_Line);
-                return There_Are_Errors;
-            }
-            break;
-        case JB:
-            if (Str_With_Argument[0] == ':')
-            {
-                return Comparison_Name_Label (Array_Labels, &Str_With_Argument[1]);
-            }
-            else
-            {
-                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
-                return There_Are_Errors;
-            }
-            break;
-        case JBE:
-            if (Str_With_Argument[0] == ':')
-            {
-                return Comparison_Name_Label (Array_Labels, &Str_With_Argument[1]);
-            }
-            else
-            {
-                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
-                return There_Are_Errors;
-            }
-            break;
-        case JA:
-            if (Str_With_Argument[0] == ':')
-            {
-                return Comparison_Name_Label (Array_Labels, &Str_With_Argument[1]);
-            }
-            else
-            {
-                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
-                return There_Are_Errors;
-            }
-            break;
-        case JAE:
-            if (Str_With_Argument[0] == ':')
-            {
-                return Comparison_Name_Label (Array_Labels, &Str_With_Argument[1]);
-            }
-            else
-            {
-                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
-                return There_Are_Errors;
-            }
-            break;
-        case JE:
-            if (Str_With_Argument[0] == ':')
-            {
-                return Comparison_Name_Label (Array_Labels, &Str_With_Argument[1]);
-            }
-            else
-            {
-                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
-                return There_Are_Errors;
-            }
-            break;
-        case JNE:
-            if (Str_With_Argument[0] == ':')
-            {
-                return Comparison_Name_Label (Array_Labels, &Str_With_Argument[1]);
-            }
-            else
-            {
-                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
-                return There_Are_Errors;
-            }
-            break;
-        case JMP:
-            if (Str_With_Argument[0] == ':')
-            {
-                return Comparison_Name_Label (Array_Labels, &Str_With_Argument[1]);
-            }
-            else
-            {
-                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
-                return There_Are_Errors;
-            }
-            break;
-        case CALL:
-            if (Str_With_Argument[0] == ':')
-            {
-                return Comparison_Name_Label (Array_Labels, &Str_With_Argument[1]);
-            }
-            else
-            {
-                printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
-                return There_Are_Errors;
-            }
-            break;
-        default:
-            return 0;
-            break;
+        }
     }
-    //TODO FREEEEE?!?!??!?!?
+
+    int Number = atoi (Str_With_Number);
+    free (Str_With_Task);
+    free (Str_With_Number);
+    return Number;
 }
 
 int Append_Argument (byte_code_k* const Byte_Code, const int Value, const int Number_Command, array_labels_k* const Array_Labels)
 {
-    switch (Number_Command)
-    {
-        case PUSH:
-            if (Append_In_Byte_Code (Byte_Code, Value) == There_Are_Errors)
-            {
-                return There_Are_Errors;
-            }
-            break;
-        case PUSHREG:
-            if (Append_In_Byte_Code (Byte_Code, Value) == There_Are_Errors)
-            {
-                return There_Are_Errors;
-            }
-            break;
-        case PUSHMEM:
-            if (Append_In_Byte_Code (Byte_Code, Value) == There_Are_Errors)
-            {
-                return There_Are_Errors;
-            }
-            break;
-        case POPMEM:
-            if (Append_In_Byte_Code (Byte_Code, Value) == There_Are_Errors)
-            {
-                return There_Are_Errors;
-            }
-            break;
-        case POPREG:
-            if (Append_In_Byte_Code (Byte_Code, Value) == There_Are_Errors)
-            {
-                return There_Are_Errors;
-            }
-            break;
-        case JB:
-            if (Append_In_Byte_Code (Byte_Code, Array_Labels->Ptr_Array_Labels[Value].Programme_Counter) == There_Are_Errors)
-            {
-                return There_Are_Errors;
-            }
-            break;
-        case JBE:
-            if (Append_In_Byte_Code (Byte_Code, Array_Labels->Ptr_Array_Labels[Value].Programme_Counter) == There_Are_Errors)
-            {
-                return There_Are_Errors;
-            }
-            break;
-        case JA:
-            if (Append_In_Byte_Code (Byte_Code, Array_Labels->Ptr_Array_Labels[Value].Programme_Counter) == There_Are_Errors)
-            {
-                return There_Are_Errors;
-            }
-            break;
-        case JAE:
-            if (Append_In_Byte_Code (Byte_Code, Array_Labels->Ptr_Array_Labels[Value].Programme_Counter) == There_Are_Errors)
-            {
-                return There_Are_Errors;
-            }
-            break;
-        case JE:
-            if (Append_In_Byte_Code (Byte_Code, Array_Labels->Ptr_Array_Labels[Value].Programme_Counter) == There_Are_Errors)
-            {
-                return There_Are_Errors;
-            }
-            break;
-        case JNE:
-            if (Append_In_Byte_Code (Byte_Code, Array_Labels->Ptr_Array_Labels[Value].Programme_Counter) == There_Are_Errors)
-            {
-                return There_Are_Errors;
-            }
-            break;
-        case JMP:
-            if (Append_In_Byte_Code (Byte_Code, Array_Labels->Ptr_Array_Labels[Value].Programme_Counter) == There_Are_Errors)
-            {
-                return There_Are_Errors;
-            }
-            break;
-        case CALL:
-            if (Append_In_Byte_Code (Byte_Code, Array_Labels->Ptr_Array_Labels[Value].Programme_Counter) == There_Are_Errors)
-            {
-                return There_Are_Errors;
-            }
-            break;
-        default:
-            break;
-    }
 
     return 0;
 }
 
 int Read_Label (const char* const Current_Line, const size_t Len_Current_Line, array_labels_k* const Array_Labels)
+{
+    char* Str_With_Task = (char*) calloc (Len_Current_Line, sizeof (char));
+    if (Str_With_Task == NULL)
+    {
+        printf ("!ERROR IN ASSEMBLER! Error allocation memory for string with task\n");
+        return There_Are_Errors;
+    }
+    char* Str_With_Label = (char*) calloc (Len_Current_Line, sizeof (char));
+    if (Str_With_Label == NULL)
+    {
+        printf ("!ERROR IN ASSEMBLER! Error allocation memory for string with arguments\n");
+        return There_Are_Errors;
+    }
+
+    sscanf (Current_Line, "%s %s", Str_With_Task, Str_With_Label);
+
+    if (Str_With_Label[0] == ':')
+    {
+        int Number_Label = Comparison_Name_Label (Array_Labels, &Str_With_Label[1]);
+
+        free (Str_With_Label);
+        free (Str_With_Task);
+        return Array_Labels->Ptr_Array_Labels[Number_Label].Programme_Counter;
+    }
+
+    free (Str_With_Label);
+    free (Str_With_Task);
+    printf ("<%s> \n This string incorrect, label must begin :\n", Current_Line);
+    return There_Are_Errors;
+}
+
+int Read_Register (const char* const Current_Line, const size_t Len_Current_Line, array_labels_k* const Array_Labels)
+{
+    char* Str_With_Task = (char*) calloc (Len_Current_Line, sizeof (char));
+    if (Str_With_Task == NULL)
+    {
+        printf ("!ERROR IN ASSEMBLER! Error allocation memory for string with task\n");
+        return There_Are_Errors;
+    }
+    char* Str_With_Register = (char*) calloc (Len_Current_Line, sizeof (char));
+    if (Str_With_Register == NULL)
+    {
+        printf ("!ERROR IN ASSEMBLER! Error allocation memory for string with arguments\n");
+        return There_Are_Errors;
+    }
+
+    sscanf (Current_Line, "%s %s", Str_With_Task, Str_With_Register);
+
+    for (size_t Number_Register = 0; Number_Register < Quantity_Registers; Number_Register++)
+    {
+        if (strcmp (Str_With_Register, Array_Register[Number_Register].Name_Register) == 0)
+        {
+            free (Str_With_Task);
+            free (Str_With_Register);
+            return Number_Register;
+        }
+    }
+
+    free (Str_With_Task);
+    free (Str_With_Register);
+    printf ("<%s> \n This string incorrect, this register doesn't exist\n", Current_Line);
+    return There_Are_Errors;
+}
+
+int Addition_Label (const char* const Current_Line, const size_t Len_Current_Line, array_labels_k* const Array_Labels)
 {
     char* Str_With_Label = (char*) calloc (Len_Current_Line, sizeof (char));
     if (Str_With_Label == NULL)
@@ -671,6 +383,7 @@ int Read_Label (const char* const Current_Line, const size_t Len_Current_Line, a
         free (Str_With_Label);
         return Number_Label;
     }
+
 }
 
 int Append_In_Byte_Code (byte_code_k* const Byte_Code, const int Value)

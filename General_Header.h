@@ -27,7 +27,7 @@ enum Name_Command
     POPMEM = 22,
     DRAW = 23,
     HLT = 0,
-    Bad_Input = -1
+    Quantity_Commands = 24
 };
 
 enum Name_Registers
@@ -36,11 +36,19 @@ enum Name_Registers
     BX = 1,
     CX = 2,
     DX = 3,
-    Quantity_Registers = 4
+    Center_X = 4,
+    Center_Y = 5,
+    Rad = 6,
+    Color = 7,
+    X_1 = 8,
+    Y_1 = 9,
+    X_2 = 10,
+    Y_2 = 11,
+    Quantity_Registers = 12
 };
 
 const char Name_File_Byte_Code[] = "Byte_Code.txt";
 
-const char Name_File_Assembler[] = "Circle.asm";
+const char Name_File_Assembler[] = "Packman.asm";
 
 #endif // GENERAL_HEADER_H

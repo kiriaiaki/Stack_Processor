@@ -60,122 +60,43 @@ int Disassembly (const int* const Byte_Code, array_labels_k* const Array_Labels,
             fprintf (File_ASM, "\n:%s\n", Array_Labels->Ptr_Array_Labels[a].Name_Label);
         }
 
-        switch (Byte_Code[i])
+        int Number_Command = Byte_Code[i];
+        if (Number_Command > Quantity_Commands)
         {
-            case PUSH:
-                i++;
-                fprintf (File_ASM, "PUSH %d\n", Byte_Code[i]);
-                break;
-            case ADD:
-                fprintf (File_ASM, "ADD\n");
-                break;
-            case SUB:
-                fprintf (File_ASM, "SUB\n");
-                break;
-            case MUL:
-                fprintf (File_ASM, "MUL\n");
-                break;
-            case DIV:
-                fprintf (File_ASM, "DIV\n");
-                break;
-            case OUT:
-                fprintf (File_ASM, "OUT\n");
-                break;
-            case PUSHREG:
-                i++;
-                fprintf (File_ASM, "PUSHREG ");
-                if (Compare_Registers (Byte_Code[i], File_ASM) == There_Are_Errors)
+            printf ("Command with number <%d> does not exist\n", Number_Command);
+            return There_Are_Errors;
+        }
+
+        fprintf (File_ASM, "%s ", Array_Command[Number_Command].Name_Command);
+
+        if (Array_Command[Number_Command].Append_Argument == 1)
+        {
+            i++;
+            int Argument = Byte_Code[i];
+
+            if (Array_Command[Number_Command].Number_Append_Argument == 1)
+            {
+                fprintf (File_ASM, "%d\n", Argument);
+            }
+
+            else if (Array_Command[Number_Command].Number_Append_Argument == 2)
+            {
+                if (Compare_Registers (Argument, File_ASM) == There_Are_Errors)
                 {
                     return There_Are_Errors;
                 }
-                break;
-            case POPREG:
-                i++;
-                fprintf (File_ASM, "PUSHREG ");
-                if (Compare_Registers (Byte_Code[i], File_ASM) == There_Are_Errors)
+                fprintf (File_ASM, "\n");
+            }
+
+            else if (Array_Command[Number_Command].Number_Append_Argument == 3)
+            {
+                if (Print_Label (File_ASM, Array_Labels, Argument) == There_Are_Errors)
                 {
                     return There_Are_Errors;
                 }
-                break;
-            case JB:
-                i++;
-                fprintf (File_ASM, "JB :");
-                if (Print_Label (File_ASM, Array_Labels, Byte_Code[i]) == There_Are_Errors)
-                {
-                    return There_Are_Errors;
-                }
-                break;
-            case JBE:
-                i++;
-                fprintf (File_ASM, "JBE :");
-                if (Print_Label (File_ASM, Array_Labels, Byte_Code[i]) == There_Are_Errors)
-                {
-                    return There_Are_Errors;
-                }
-                break;
-            case JA:
-                i++;
-                fprintf (File_ASM, "JA :");
-                if (Print_Label (File_ASM, Array_Labels, Byte_Code[i]) == There_Are_Errors)
-                {
-                    return There_Are_Errors;
-                }
-                break;
-            case JAE:
-                i++;
-                fprintf (File_ASM, "JAE :");
-                if (Print_Label (File_ASM, Array_Labels, Byte_Code[i]) == There_Are_Errors)
-                {
-                    return There_Are_Errors;
-                }
-                break;
-            case JE:
-                i++;
-                fprintf (File_ASM, "JE :");
-                if (Print_Label (File_ASM, Array_Labels, Byte_Code[i]) == There_Are_Errors)
-                {
-                    return There_Are_Errors;
-                }
-                break;
-            case JNE:
-                i++;
-                fprintf (File_ASM, "JNE :");
-                if (Print_Label (File_ASM, Array_Labels, Byte_Code[i]) == There_Are_Errors)
-                {
-                    return There_Are_Errors;
-                }
-                break;
-            case JMP:
-                i++;
-                fprintf (File_ASM, "JMP :");
-                if (Print_Label (File_ASM, Array_Labels, Byte_Code[i]) == There_Are_Errors)
-                {
-                    return There_Are_Errors;
-                }
-                break;
-            case SQRT:
-                fprintf (File_ASM, "SQRT\n");
-                break;
-            case IN:
-                fprintf (File_ASM, "IN\n");
-                break;
-            case CALL:
-                i++;
-                fprintf (File_ASM, "CALL :");
-                if (Print_Label (File_ASM, Array_Labels, Byte_Code[i]) == There_Are_Errors)
-                {
-                    return There_Are_Errors;
-                }
-                break;
-            case RET:
-                fprintf (File_ASM, "\nRET\n");
-                break;
-            case HLT:
-                fprintf (File_ASM, "HLT\n");
-                break;
-            default:
-                printf ("Command with number <%d> does not exist\n", Byte_Code[i]);
-                return There_Are_Errors;
+
+            }
+
         }
 
         i++;
@@ -259,23 +180,12 @@ int Verifier_Byte_Code (const int* const Byte_Code)
 
 int Compare_Registers (const int Number_Register, FILE* const File_ASM)
 {
-    switch (Number_Register)
+    fprintf (File_ASM, "%s", Array_Register[Number_Register].Name_Register);
+
+    if (Number_Register >= Quantity_Registers)
     {
-        case AX:
-            fprintf (File_ASM, "AX\n");
-            break;
-        case BX:
-            fprintf (File_ASM, "BX\n");
-            break;
-        case CX:
-            fprintf (File_ASM, "CX\n");
-            break;
-        case DX:
-            fprintf (File_ASM, "DX\n");
-            break;
-        default:
-            printf ("Register with number <%d> does not exist\n", Number_Register);
-            return There_Are_Errors;
+        printf ("Register with number <%d> does not exist\n", Number_Register);
+        return There_Are_Errors;
     }
 
     return 0;
@@ -423,12 +333,12 @@ int Print_Label (FILE* const File_ASM, array_labels_k* const Array_Labels, const
             return There_Are_Errors;
         }
 
-        fprintf (File_ASM, "%s\n\n", Array_Labels->Ptr_Array_Labels[size_t (Comparison_Programme_Counter_Label (Array_Labels, Programme_Counter))].Name_Label);
+        fprintf (File_ASM, ":%s\n\n", Array_Labels->Ptr_Array_Labels[size_t (Comparison_Programme_Counter_Label (Array_Labels, Programme_Counter))].Name_Label);
     }
 
     else
     {
-        fprintf (File_ASM, "%s\n\n", Array_Labels->Ptr_Array_Labels[Number_Label].Name_Label);
+        fprintf (File_ASM, ":%s\n\n", Array_Labels->Ptr_Array_Labels[Number_Label].Name_Label);
     }
 
     return 0;
