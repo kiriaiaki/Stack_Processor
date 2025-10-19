@@ -49,6 +49,6 @@ enum Name_Registers
 
 const char Name_File_Byte_Code[] = "Byte_Code.txt";
 
-const char Name_File_Assembler[] = "Packman.asm";
+const char Name_File_Assembler[] = "code.asm/Packman.asm";
 
 #endif // GENERAL_HEADER_H

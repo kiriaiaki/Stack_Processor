@@ -21,6 +21,13 @@ int main ()
     Byte_Code.Ptr_Byte_Code[1] = Version;
     Byte_Code.Ptr_Byte_Code[2] = Number_Version_Assembler;
 
+    // TODO пустые аргументы (мб обертку)
+    // TODO двойные функции ;(
+    // TODO костыль общий массив структур почему так? не знаю как по другому (тк требует функцию!) (попробовать переместить)
+    // TODO квадратные скобки у функций с памятью (проблема с массивом структур)
+    // TODO рабочий файл через командную строку
+    
+
     struct array_labels_k Array_Labels = {};
     if (Array_Labels.Ptr_Array_Labels == NULL)
     {
