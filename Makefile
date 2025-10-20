@@ -1,5 +1,7 @@
 CC := g++
 
+objects = Processor.o Stack.o
+
 DED_FLAGS := "-D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ \
         -Wc++14-compat -Wmissing-declarations -Wcast-align -Wcast-qual \
         -Wchar-subscripts -Wconversion -Wctor-dtor-privacy -Wempty-body \
@@ -13,13 +15,11 @@ DED_FLAGS := "-D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ \
         -fstack-protector -fstrict-overflow -fno-omit-frame-pointer \
         -Wlarger-than=8192 -fPIE -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,nonnull-attribute,null,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr"
 
-
-all:
+all: ball
 	@$(CC) Assembler.cpp $(DED_FLAGS) -o a.out
 	@./a.out
 	@$(CC) Disassembler.cpp $(DED_FLAGS) -o b.out
 	@./b.out
-	@$(CC) Processor.cpp $(DED_FLAGS) -o c.out
 	@./c.out
 
 clean:
@@ -28,5 +28,14 @@ clean:
 	@rm -rf c.out
 	@rm -rf disassembler.asm
 	@rm -rf Byte_Code.txt
+	@rm -rf Processor.o
+	@rm -rf Stack.o
 	@clear
 	@clear
+
+ball: $(objects)
+	@$(CC) $(objects) -o c.out
+
+$(objects): %.o: %.cpp
+	@$(CC) -c $^ $(DED_FLAGS) -o $@
+

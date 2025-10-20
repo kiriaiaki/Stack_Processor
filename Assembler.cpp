@@ -1,4 +1,27 @@
 #include "Assembler.h"
+//
+// in header
+// template <typename T>
+// struct Array
+//     {
+//     T* data;
+//     int size;
+//     int capacity;
+//     };
+//
+// template <typename T>
+// T ArrayGet (Array<T>* arr, int num)
+//     {
+//     assert (0 <= num && num < arr->size);
+//     return arr->data [num];
+//     }
+//
+// in cpp
+// Array <int>    arr1 = {};
+// Array <double> arr2 = {};
+//
+// int    i = ArrayGet (&arr1, 1);
+// double d = ArrayGet (&arr2, 1);
 
 int main ()
 {
@@ -17,9 +40,9 @@ int main ()
         printf ("\033[31m!NOT START ASSEMBLER!\033[0m \nError allocating memory for byte code\n");
         return 0;
     }
-    Byte_Code.Ptr_Byte_Code[0] = Password;
-    Byte_Code.Ptr_Byte_Code[1] = Version;
-    Byte_Code.Ptr_Byte_Code[2] = Number_Version_Assembler;
+        Byte_Code.Ptr_Byte_Code[0] = Password;
+        Byte_Code.Ptr_Byte_Code[1] = Version;
+        Byte_Code.Ptr_Byte_Code[2] = Number_Version_Assembler;
 
     struct array_labels_k Array_Labels = {};
     if (Array_Labels.Ptr_Array_Labels == NULL)
@@ -187,7 +210,7 @@ int Read_Task (const char* const Current_Line, const size_t Len_Current_Line, by
         {
             return There_Are_Errors;
         }
-        Array_Labels->Ptr_Array_Labels[Number_Label].Programme_Counter = int (Byte_Code->Counter_Byte_Code);
+        Array_Labels->Ptr_Array_Labels[Number_Label].Programme_Counter = int (Byte_Code->Counter_Byte_Code); //
         return 0;
     }
 
@@ -200,7 +223,7 @@ int Read_Task (const char* const Current_Line, const size_t Len_Current_Line, by
                 return There_Are_Errors;
             }
 
-            if (Array_Command[Number_Command].Append_Argument == 1)
+            if (Array_Command[Number_Command].Read_Argument != NULL)
             {
                 int Value = (*Array_Command[Number_Command].Read_Argument) (Current_Line, Len_Current_Line, Array_Labels);
 
@@ -269,7 +292,7 @@ int Read_Number (const char* const Current_Line, const size_t Len_Current_Line, 
 
             else
             {
-                printf ("<%s> \nThis string incorrect, argument push not a number\n", Current_Line);
+                printf ("<%s> \nThis string incorrect, argument push not a number in task.asm:14\n", Current_Line);
                 free (Str_With_Task);
                 free (Str_With_Number);
                 return There_Are_Errors;
@@ -335,7 +358,7 @@ int Read_Register (const char* const Current_Line, const size_t Len_Current_Line
         printf ("!ERROR IN ASSEMBLER! Error allocation memory for string with arguments\n");
         return There_Are_Errors;
     }
-
+    // убрать кал(оки) в каждой функции хеширование бин поиск %n %*s
     sscanf (Current_Line, "%s %s", Str_With_Task, Str_With_Register);
 
     for (size_t Number_Register = 0; Number_Register < Quantity_Registers; Number_Register++)
@@ -344,7 +367,7 @@ int Read_Register (const char* const Current_Line, const size_t Len_Current_Line
         {
             free (Str_With_Task);
             free (Str_With_Register);
-            return Number_Register;
+            return Number_Register; // вынести в функцию файнд
         }
     }
 

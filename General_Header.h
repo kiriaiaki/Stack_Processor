@@ -47,8 +47,46 @@ enum Name_Registers
     Quantity_Registers = 12
 };
 
+const int There_Are_Errors = -2902;
+
 const char Name_File_Byte_Code[] = "Byte_Code.txt";
 
 const char Name_File_Assembler[] = "code.asm/Packman.asm";
+
+
+// struct command_k
+// {
+//     char Name_Command[10];
+//     int (*Fun_Read_Argument) (const char* const Current_Line, const size_t Len_Current_Line, array_labels_k* const Array_Labels);
+//     int Type_Argument;
+//     int (*Fun_Processor) (struct processor_k* const Processor, const int Number_Command);
+// };
+//
+// const command_k Array_Command[Quantity_Commands] = {
+// {"HLT",     NULL,           0,  NULL                       },
+// {"PUSH",    Read_Number,    1,  Processor_Pushs            },
+// {"ADD",     NULL,           0,  Processor_Math             },
+// {"SUB",     NULL,           0,  Processor_Math             },
+// {"MUL",     NULL,           0,  Processor_Math             },
+// {"DIV",     NULL,           0,  Processor_Math             },
+// {"OUT",     NULL,           0,  Processor_Out              },
+// {"PUSHREG", Read_Register,  2,  Processor_Pushs            },
+// {"POPREG",  Read_Register,  2,  Processor_Pops             },
+// {"JB",      Read_Label,     3,  Processor_Conditional_Jump },
+// {"JBE",     Read_Label,     3,  Processor_Conditional_Jump },
+// {"JA",      Read_Label,     3,  Processor_Conditional_Jump },
+// {"JAE",     Read_Label,     3,  Processor_Conditional_Jump },
+// {"JE",      Read_Label,     3,  Processor_Conditional_Jump },
+// {"JNE",     Read_Label,     3,  Processor_Conditional_Jump },
+// {"JMP",     Read_Label,     3,  Processor_Jump             },
+// {"SQRT",    NULL,           0,  Processor_Sqrt             },
+// {"LABEL",   Addition_Label, 0,  NULL                       },
+// {"IN",      NULL,           0,  Processor_In               },
+// {"CALL",    Read_Label,     3,  Processor_Call             },
+// {"RET",     NULL,           0,  Processor_Return           },
+// {"PUSHMEM", Read_Register,  2,  Processor_Pushs            },
+// {"POPMEM",  Read_Register,  2,  Processor_Pops             },
+// {"DRAW",    NULL,           0,  Processor_Draw             }
+// };
 
 #endif // GENERAL_HEADER_H

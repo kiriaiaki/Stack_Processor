@@ -9,7 +9,7 @@ POPREG CX
 
 PUSHREG AX
 PUSH 0
-JE :A_Below_Null
+JE :A_Null
 
 CALL :Discriminant
 
@@ -70,12 +70,32 @@ JA :Two_Solve
     OUT
     JMP :Finish
 
-:A_Below_Null
+:A_Null
+    PUSHREG BX
+    PUSH 0
+    JE :B_Null
+
+    PUSH 1
+    OUT
     PUSH -1
     PUSHREG CX
     MUL
     PUSHREG BX
     DIV
+    OUT
+    JMP :Finish
+
+:B_Null
+    PUSHREG CX
+    PUSH 0
+    JE :C_Null
+
+    PUSH -1
+    OUT
+    JMP :Finish
+
+:C_Null
+    PUSH 8
     OUT
     JMP :Finish
 

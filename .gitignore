@@ -3,3 +3,5 @@ b.out
 c.out
 disassembler.asm
 Byte_Code.txt
+Processor.o
+Stack.o

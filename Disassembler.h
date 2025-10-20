@@ -20,8 +20,6 @@ struct array_labels_k
     size_t Len_Array_Labels = 2;
 };
 
-const int There_Are_Errors = -2902;
-
 enum Work_Byte_Code
 {
     Password = 29022008,
