@@ -36,9 +36,9 @@ int Run (processor_k* const Processor)
     {
         int Value = 0;
 
-        if (Array_Command[Current_Number_Command].Fun != NULL)
+        if (Array_Command[Current_Number_Command].Fun_Processor != NULL)
         {
-           if ((*Array_Command[Current_Number_Command].Fun) (Processor, Current_Number_Command) == There_Are_Errors)
+           if ((*Array_Command[Current_Number_Command].Fun_Processor) (Processor, Current_Number_Command) == There_Are_Errors)
            {
                 return There_Are_Errors;
            }
@@ -648,13 +648,13 @@ int* Receiving_Byte_Code ()
 
 int Verifier_Byte_Code (const processor_k* const Processor)
 {
-    if (Processor->Array_Byte_Code[0] != Password)
+    if (Processor->Array_Byte_Code[0] != Password_Processor)
     {
         printf ("Password doesn't work\n Likely this byte code created not my assembler\n");
         return There_Are_Errors;
     }
 
-    if (Processor->Array_Byte_Code[1] != Version)
+    if (Processor->Array_Byte_Code[1] != Version_Processor)
     {
         printf ("Password doesn't work\n Likely this byte code created not my assembler\n");
         return There_Are_Errors;

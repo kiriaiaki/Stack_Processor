@@ -38,4 +38,3 @@ ball: $(objects)
 
 $(objects): %.o: %.cpp
 	@$(CC) -c $^ $(DED_FLAGS) -o $@
-
