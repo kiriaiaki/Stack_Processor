@@ -1627,6 +1627,159 @@ CALL :Start
     PUSH 37
     POPMEM CX   // Number 2
 
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 55
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 84
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // T
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 56
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 82
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // R
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 57
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 89
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // Y
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 59
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 65
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // A
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 60
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 71
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // G
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 61
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 65
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // A
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 62
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 73
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // I
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 63
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 78
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // N
+
+
     RET
 
 :Print_Win
@@ -1857,6 +2010,158 @@ CALL :Start
     POPREG CX
     PUSH 37
     POPMEM CX   // Number 2
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 55
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 89
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // Y
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 56
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 79
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // O
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 57
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 85
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // U
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 59
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 71
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // G
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 60
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 82
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // R
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 61
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 69
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // E
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 62
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 65
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // A
+
+    PUSH 32
+    PUSH 80
+    PUSH 2
+    MUL
+    MUL
+    PUSH 63
+    PUSH 2
+    MUL
+    ADD
+    POPREG CX
+    PUSH 84
+    POPMEM CX
+    PUSH 1
+    PUSHREG CX
+    ADD
+    POPREG CX
+    PUSH 37
+    POPMEM CX   // T
 
     DRAW
     HLT
