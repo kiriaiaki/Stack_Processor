@@ -27,7 +27,7 @@ enum Verifier_Byte_Code_Processor
     Number_Version_Processor = 1
 };
 
-const size_t Size_Ram = 7200;
+const size_t Size_Ram = 7300;
 
 struct processor_k
 {
@@ -64,7 +64,7 @@ int Processor_Out              (processor_k* const Processor, const int Number_C
 int Processor_Call             (processor_k* const Processor, const int Number_Command);
 int Processor_Return           (processor_k* const Processor, const int Number_Command);
 int Processor_Draw             (processor_k* const Processor, const int Number_Command);
-
+int Processor_Random           (processor_k* const Processor, const int Number_Command);
 
 int* Create_Ram ();
 int Delete_Ram  (int* const Random_Access_Memory);
@@ -106,7 +106,8 @@ const command_k Array_Command[Quantity_Commands] = {
 {1,  Processor_Return},
 {1,  Processor_Pushs},
 {1,  Processor_Pops},
-{1,  Processor_Draw}
+{1,  Processor_Draw},
+{1,  Processor_Random}
 };
 
 const char* Array_Name_Register[Quantity_Registers] = {
@@ -121,7 +122,15 @@ const char* Array_Name_Register[Quantity_Registers] = {
     "X_1",
     "Y_1",
     "X_2",
-    "Y_2"
+    "Y_2",
+    "X_3",
+    "Y_3",
+    "X_A",
+    "Y_A",
+    "Direction",
+    "Len",
+    "For",
+    "Score"
 };
 
 #endif // PROCESSOR_H

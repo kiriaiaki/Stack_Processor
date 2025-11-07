@@ -26,8 +26,9 @@ enum Name_Command
     PUSHMEM = 21,
     POPMEM = 22,
     DRAW = 23,
+    RANDOM = 24,
     HLT = 0,
-    Quantity_Commands = 24
+    Quantity_Commands = 25
 };
 
 enum Name_Registers
@@ -44,14 +45,22 @@ enum Name_Registers
     Y_1 = 9,
     X_2 = 10,
     Y_2 = 11,
-    Quantity_Registers = 12
+    X_3 = 12,
+    Y_3 = 13,
+    X_A = 14,
+    Y_A = 15,
+    Direction = 16,
+    Len = 17,
+    For = 18,
+    Score = 19,
+    Quantity_Registers = 20
 };
 
 const int There_Are_Errors = -2902;
 
 const char Name_File_Byte_Code[] = "Byte_Code.txt";
 
-const char Name_File_Assembler[] = "code.asm/Packman.asm";
+const char Name_File_Assembler[] = "code.asm/Snake.asm";
 //
 // const char* Array_Name_Register[Quantity_Registers] = {
 //     "AX",

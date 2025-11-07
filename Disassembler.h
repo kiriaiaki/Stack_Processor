@@ -44,7 +44,15 @@ const register_k Array_Register[Quantity_Registers] = {
 {"X_1"},
 {"Y_1"},
 {"X_2"},
-{"Y_2"}
+{"Y_2"},
+{"X_3"},
+{"Y_3"},
+{"X_A"},
+{"Y_A"},
+{"Direction"},
+{"Len"},
+{"For"},
+{"Score"}
 };
 
 struct command_k
@@ -78,7 +86,8 @@ const command_k Array_Command[Quantity_Commands] = {
 {"RET",         0, 0},
 {"PUSHMEM",     1, 2},
 {"POPMEM",      1, 2},
-{"DRAW",        0, 0}
+{"DRAW",        0, 0},
+{"RANDOM",      0, 0}
 };
 
 int Disassembly (const int* const Byte_Code, array_labels_k* const Array_Labels, FILE* const File_ASM);

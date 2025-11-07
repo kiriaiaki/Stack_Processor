@@ -1,5 +1,98 @@
 #include "Processor.h"
 
+#include <termios.h> // Для работы с терминалом
+#include <sys/time.h>
+#include <sys/types.h>
+#include <stdlib.h>
+// Глобальная переменная для хранения исходных настроек терминала
+struct termios orig_termios;
+// Функция для сброса настроек терминала при выходе из программы
+void reset_terminal_mode()
+{
+    tcsetattr(STDIN_FILENO, TCSANOW, &orig_termios);
+}
+
+void set_conio_mode()
+{
+    struct termios new_termios;
+
+    // Получаем текущие настройки терминала
+    tcgetattr(STDIN_FILENO, &orig_termios);
+
+    // Устанавливаем функцию сброса настроек при завершении программы
+    atexit(reset_terminal_mode);
+
+    // Копируем текущие настройки в новый набор
+    new_termios = orig_termios;
+
+    // Отключаем канонический режим (ICANON) и эхо-режим (ECHO)
+    new_termios.c_lflag &= ~(ICANON | ECHO);
+
+    // Устанавливаем минимальное количество символов для чтения (1)
+    new_termios.c_cc[VMIN] = 1;
+    // Устанавливаем таймаут (0, так как select() сам обрабатывает время)
+    new_termios.c_cc[VTIME] = 0;
+
+    // Применяем новые настройки немедленно (TCSANOW)
+    tcsetattr(STDIN_FILENO, TCSANOW, &new_termios);
+}
+
+int timed_getchar_no_enter (int milliseconds)
+{
+    fd_set set;
+    struct timeval timeout;
+    struct timeval start_time, current_time;
+    long elapsed_ms, remaining_ms;
+    int rv;
+    char buffer;
+    int result_char = 0; // 0 или символ
+
+    // Запоминаем время начала операции
+    gettimeofday(&start_time, NULL);
+
+    // Устанавливаем время ожидания для select() равное общему времени
+    timeout.tv_sec = milliseconds / 1000;
+    timeout.tv_usec = (milliseconds % 1000) * 1000;
+
+    FD_ZERO(&set);
+    FD_SET(STDIN_FILENO, &set);
+
+    // Ожидание ввода с таймаутом
+    // select() изменит структуру timeout, показав оставшееся время при успешном вводе
+    rv = select(STDIN_FILENO + 1, &set, NULL, NULL, &timeout);
+
+    if (rv > 0)
+    {
+        // Ввод успешен, читаем символ
+        if (read(STDIN_FILENO, &buffer, 1) == 1)
+        {
+            result_char = (int)buffer;
+        }
+    }
+    // Если rv <= 0 (таймаут или ошибка), buffer не читается
+
+    // --- Логика принудительной задержки до общего времени ---
+
+    // Получаем текущее время после select() и потенциального чтения
+    gettimeofday(&current_time, NULL);
+
+    // Вычисляем, сколько времени прошло в миллисекундах
+    elapsed_ms = (current_time.tv_sec - start_time.tv_sec) * 1000L +
+                 (current_time.tv_usec - start_time.tv_usec) / 1000L;
+
+    // Вычисляем оставшееся время
+    remaining_ms = milliseconds - elapsed_ms;
+
+    // Если осталось время, делаем паузу
+    if (remaining_ms > 0) {
+        // Используем usleep (мкс) или nanosleep (нс)
+        usleep(remaining_ms * 1000L);
+    }
+
+    // Возвращаем результат ввода (0 если не было ввода, или символ)
+    return result_char;
+}
+
 int main ()
 {
     struct processor_k Processor = {};
@@ -462,20 +555,26 @@ int Processor_Jump (processor_k* const Processor, const int Number_Command)
 
 int Processor_In (processor_k* const Processor, const int Number_Command)
 {
-    char Value[150];
+//     char Value[150];
+//
+//     printf ("Value : ");
+//     scanf ("%[^\n]", Value);
+//     getchar ();
+//
+//     while (Check_Input (Value) != 0)
+//     {
+//         printf ("Value : ");
+//         scanf ("%[^\n]", Value);
+//         getchar ();
+//     }
 
-    printf ("Value : ");
-    scanf ("%[^\n]", Value);
-    getchar ();
+    set_conio_mode();
 
-    while (Check_Input (Value) != 0)
-    {
-        printf ("Value : ");
-        scanf ("%[^\n]", Value);
-        getchar ();
-    }
+    int timeout_millisec = 70;
 
-    if (Stack_Push (&Processor->Stack, atoi (Value)) == There_Are_Errors)
+    int Value = timed_getchar_no_enter(timeout_millisec);
+
+    if (Stack_Push (&Processor->Stack, Value) == There_Are_Errors)
     {
         return There_Are_Errors;
     }
@@ -529,7 +628,7 @@ int Processor_Draw (processor_k* const Processor, const int Number_Command)
     printf ("\033[H\033[J");
     fflush(stdout);
 
-    for (size_t i = 0; i < Size_Ram; i+=2)
+    for (size_t i = 0; i < 9*5 * 16*5 * 2; i+=2)
     {
         printf ("\033[%dm%c \033[0m", Processor->Random_Access_Memory[i + 1], Processor->Random_Access_Memory[i]);
 
@@ -542,6 +641,26 @@ int Processor_Draw (processor_k* const Processor, const int Number_Command)
     usleep (30000);
 
     return 0;
+}
+
+int Processor_Random (processor_k* const Processor, const int Number_Command)
+{
+    srand(time(NULL));
+
+    int Size = Stack_Pop (&Processor->Stack);
+    if (Size == There_Are_Errors)
+    {
+        return There_Are_Errors;
+    }
+
+    int Value = 2 + ((rand() % Size) * 5); // (число от 0 до Size)*5 + 2
+
+    if (Stack_Push (&Processor->Stack, Value) == There_Are_Errors)
+    {
+        return There_Are_Errors;
+    }
+
+    return Not_Error_Processor;
 }
 
 
