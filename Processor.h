@@ -27,7 +27,7 @@ enum Verifier_Byte_Code_Processor
     Number_Version_Processor = 1
 };
 
-const size_t Size_Ram = 7300;
+const size_t Size_Ram = 7400;
 
 struct processor_k
 {

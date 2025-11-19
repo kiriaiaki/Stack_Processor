@@ -95,7 +95,7 @@ CALL :Start
     POPREG Score
 
     PUSHREG Score
-    PUSH 29
+    PUSH 90
     JE :Print_Win
 
     PUSHREG Len
@@ -171,10 +171,10 @@ CALL :Start
 
     :Mini_Move
 
-    PUSH 34 // синий
+    PUSH 30 // синий
     CALL :Paint_All_Dot
 
-    PUSH 32 // зеленый
+    PUSH 30 // зеленый
     CALL :Paint_Field
 
     PUSHREG X_A
@@ -501,6 +501,12 @@ CALL :Start
     PUSH 2
     POPREG DX
 
+    PUSH 0
+    POPREG AX
+
+    PUSH 0
+    POPREG BX
+
     CALL :For_BX
 
     PUSH 0
@@ -520,6 +526,12 @@ CALL :Start
     PUSH 1
     POPREG DX
 
+    PUSH 0
+    POPREG AX
+
+    PUSH 0
+    POPREG BX
+
     CALL :For_BX
 
     PUSH 0
@@ -532,6 +544,12 @@ CALL :Start
 
     PUSH 3
     POPREG DX
+
+    PUSH 0
+    POPREG AX
+
+    PUSH 0
+    POPREG BX
 
     CALL :For_BX
 
